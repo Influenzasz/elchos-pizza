@@ -118,8 +118,21 @@ namespace PizzaSystem
             }
 
             Console.WriteLine("\n[Статус] Система Elcho's Pizza активна и готова к обслуживанию клиентов.");
-            Console.WriteLine("Для остановки сервера закройте это окно или нажмите Enter.");
-            Console.ReadLine();
+
+            // В Docker / на облачном хостинге stdin перенаправлен, поэтому ждем сигнал завершения бесконечно
+            if (Console.IsInputRedirected || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PORT")))
+            {
+                Console.WriteLine("[Cloud] Сервер работает в непрерывном фоновом режиме.");
+                var exitEvent = new ManualResetEvent(false);
+                AppDomain.CurrentDomain.ProcessExit += (s, e) => exitEvent.Set();
+                Console.CancelKeyPress += (s, e) => { e.Cancel = true; exitEvent.Set(); };
+                exitEvent.WaitOne();
+            }
+            else
+            {
+                Console.WriteLine("Для остановки сервера закройте это окно или нажмите Enter.");
+                try { Console.ReadLine(); } catch { Thread.Sleep(Timeout.Infinite); }
+            }
 
             EventBus.Stop();
             server.Stop();
