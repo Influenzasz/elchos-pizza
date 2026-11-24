@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Электронное Табло Готовности Заказов — Elcho's Pizza</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #060C18;
+            color: #F8FAFC;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+            /* subtle dot-grid */
+            background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        /* ───── HEADER ───── */
+        .board-header {
+            background: rgba(10,16,32,0.98);
+            border-bottom: 2px solid #1E293B;
+            padding: 12px 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .board-logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .board-logo-text {
+            font-size: 1.9rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #FF6900, #FBBF24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        .board-clock-wrap {
+            text-align: right;
+        }
+        .board-clock {
+            font-size: 2.4rem;
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+            color: #F8FAFC;
+            line-height: 1;
+        }
+        .board-date {
+            font-size: 0.88rem;
+            color: #64748B;
+            margin-top: 2px;
+        }
+
+        /* ───── MAIN GRID ───── */
+        .board-grid {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px 28px;
+            min-height: 0;
+        }
+        .board-col {
+            border-radius: 24px;
+            border: 2px solid;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        .board-col-cooking {
+            border-color: rgba(245,158,11,0.35);
+            background: linear-gradient(160deg, #130F01 0%, #1A1300 100%);
+        }
+        .board-col-ready {
+            border-color: rgba(16,185,129,0.4);
+            background: linear-gradient(160deg, #011310 0%, #001812 100%);
+        }
+
+        .board-col-header {
+            padding: 18px 24px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .col-cooking-head {
+            background: rgba(245,158,11,0.08);
+            color: #F59E0B;
+            border-color: rgba(245,158,11,0.2);
+        }
+        .col-ready-head {
+            background: rgba(16,185,129,0.1);
+            color: #10B981;
+            border-color: rgba(16,185,129,0.25);
+        }
+
+        .board-col-subtitle {
+            font-size: 0.75rem;
+            font-weight: 700;
+            opacity: 0.6;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .board-numbers-grid {
+            flex-grow: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 14px;
+            align-content: start;
+            overflow-y: auto;
+        }
+
+        .order-badge-number {
+            border-radius: 20px;
+            padding: 20px 10px;
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            border: 2px solid;
+            transition: all 0.35s;
+            line-height: 1;
+            position: relative;
+        }
+        .badge-cooking {
+            color: #FBBF24;
+            background: rgba(245,158,11,0.08);
+            border-color: rgba(245,158,11,0.3);
+        }
+        .badge-ready {
+            color: #10B981;
+            background: rgba(16,185,129,0.12);
+            border-color: #10B981;
+            box-shadow: 0 0 24px rgba(16,185,129,0.3), inset 0 0 20px rgba(16,185,129,0.05);
+            animation: readyPulse 2.2s infinite;
+        }
+        @keyframes readyPulse {
+            0%   { transform: scale(1);    box-shadow: 0 0 10px rgba(16,185,129,0.25); }
+            50%  { transform: scale(1.04); box-shadow: 0 0 32px rgba(16,185,129,0.6); }
+            100% { transform: scale(1);    box-shadow: 0 0 10px rgba(16,185,129,0.25); }
+        }
+
+        /* ───── DING ANIMATION ───── */
+        .badge-ding {
+            animation: dingEffect 0.6s ease !important;
+        }
+        @keyframes dingEffect {
+            0%   { transform: scale(1.0); filter: brightness(1); }
+            25%  { transform: scale(1.3); filter: brightness(2); }
+            60%  { transform: scale(0.95); }
+            100% { transform: scale(1.04); filter: brightness(1); }
+        }
+
+        /* ───── EMPTY STATES ───── */
+        .board-empty-msg {
+            color: #334155;
+            font-size: 1rem;
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 50px 20px;
+            line-height: 1.6;
+        }
+
+        /* ───── TICKER ───── */
+        .board-ticker {
+            background: #0A0F1A;
+            border-top: 1px solid #1E293B;
+            padding: 10px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .ticker-text {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #94A3B8;
+            padding-left: 100%;
+        }
+        @keyframes marquee {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* ───── DING OVERLAY ───── */
+        .ding-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 999;
+            transition: opacity 0.3s;
+        }
+        .ding-overlay.show { opacity: 1; }
+        .ding-overlay .ding-emoji { font-size: 8rem; animation: dingBounce 0.5s ease; }
+        .ding-overlay .ding-text  { font-size: 2.5rem; font-weight: 900; color: #10B981; letter-spacing: 4px; }
+        @keyframes dingBounce {
+            0%   { transform: scale(0.5); }
+            60%  { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="board-header">
+        <div class="board-logo">
+            <span style="font-size:2.8rem;">🍕</span>
+            <div class="board-logo-text">ELCHO'S PIZZA</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:28px;">
+            <div class="board-clock-wrap">
+                <div class="board-clock" id="boardClock">12:00:00</div>
+                <div class="board-date"  id="boardDate">18 ноября 2026</div>
+            </div>
+            <a href="/" class="defense-pill" style="font-size:0.88rem; padding:8px 14px;">🌐 Меню</a>
+        </div>
+    </header>
+
+    <main class="board-grid">
+        <!-- ГОТОВЯТСЯ -->
+        <div class="board-col board-col-cooking">
+            <div class="board-col-header col-cooking-head">
+                <div>
+                    <div>🔥 Готовится</div>
+                    <div class="board-col-subtitle">Ваш заказ готовят повара</div>
+                </div>
+                <span id="cookingCount">0</span>
+            </div>
+            <div class="board-numbers-grid" id="cookingList">
+                <div class="board-empty-msg">Нет заказов<br>в процессе приготовления</div>
+            </div>
+        </div>
+
+        <!-- ГОТОВО -->
+        <div class="board-col board-col-ready">
+            <div class="board-col-header col-ready-head">
+                <div>
+                    <div>✅ Готово! Получайте!</div>
+                    <div class="board-col-subtitle">Заберите заказ на стойке</div>
+                </div>
+                <span id="readyCount">0</span>
+            </div>
+            <div class="board-numbers-grid" id="readyList">
+                <div class="board-empty-msg">Ожидайте ваш<br>номер заказа...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- NEWS TICKER -->
+    <footer class="board-ticker">
+        <div class="ticker-text">
+            🍕 Горячая сочная пицца за 15 минут в зале! &nbsp;•&nbsp; 🎁 Скидка 10% на самовывоз — промокод ELCHOS10 &nbsp;•&nbsp; ⭐ Попробуйте фирменную Elcho's Special &nbsp;•&nbsp; 🛵 Доставка за 30 минут или скидка! &nbsp;•&nbsp; 🥤 Бесплатный напиток при заказе от 1500 ₽ &nbsp;•&nbsp; Приятного аппетита в Elcho's Pizza!
+        </div>
+    </footer>
+
+    <!-- DING OVERLAY -->
+    <div class="ding-overlay" id="dingOverlay">
+        <div class="ding-emoji">🔔</div>
+        <div class="ding-text">DING! ЗАКАЗ ГОТОВ!</div>
+    </div>
+
+    <script>
+        // Web Audio — ding chime
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playReadyChime() {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);    // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.3);  // G5
+                osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.45); // C6
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.9);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.9);
+            } catch (e) { }
+        }
+
+        function showDingAnimation() {
+            const overlay = document.getElementById('dingOverlay');
+            overlay.classList.add('show');
+            setTimeout(() => overlay.classList.remove('show'), 2000);
+        }
+
+        let prevReadyIds = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateClock();
+            setInterval(updateClock, 1000);
+            await loadBoardData();
+            initEventSource();
+        });
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('boardClock').textContent = now.toLocaleTimeString('ru-RU');
+            document.getElementById('boardDate').textContent = now.toLocaleDateString('ru-RU', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+        }
+
+        async function loadBoardData() {
+            try {
+                const res = await fetch('/api/orders/board').then(r => r.json());
+                renderBoard(res);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function initEventSource() {
+            try {
+                const evt = new EventSource('/api/events');
+                evt.onmessage = (e) => {
+                    try {
+                        const msg = JSON.parse(e.data);
+                        if (msg.type === 'order_created' || msg.type === 'order_status_updated') {
+                            loadBoardData();
+                        }
+                    } catch (err) { }
+                };
+            } catch (e) { }
+        }
+
+        function renderBoard(data) {
+            const cookingList = document.getElementById('cookingList');
+            const readyList   = document.getElementById('readyList');
+
+            const cooking = data.cooking || [];
+            const ready   = data.ready   || [];
+
+            document.getElementById('cookingCount').textContent = cooking.length;
+            document.getElementById('readyCount').textContent   = ready.length;
+
+            // Detect new ready orders → DING
+            const currentReadyIds = ready.map(r => r.Id);
+            const hasNewReady = currentReadyIds.some(id => !prevReadyIds.includes(id));
+            if (prevReadyIds.length > 0 && hasNewReady) {
+                playReadyChime();
+                showDingAnimation();
+            }
+            prevReadyIds = currentReadyIds;
+
+            // Render cooking
+            if (cooking.length === 0) {
+                cookingList.innerHTML = '<div class="board-empty-msg">Нет заказов<br>в процессе приготовления</div>';
+            } else {
+                cookingList.innerHTML = cooking.map(o => `
+                    <div class="order-badge-number badge-cooking">
+                        ${o.OrderNumber}
+                    </div>
+                `).join('');
+            }
+
+            // Render ready
+            if (ready.length === 0) {
+                readyList.innerHTML = '<div class="board-empty-msg">Ожидайте ваш<br>номер заказа...</div>';
+            } else {
+                readyList.innerHTML = ready.map((o, idx) => `
+                    <div class="order-badge-number badge-ready ${!prevReadyIds.includes(o.Id) ? 'badge-ding' : ''}">
+                        ${o.OrderNumber}
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>

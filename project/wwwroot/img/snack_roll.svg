@@ -1,0 +1,21 @@
+﻿<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='tortilla' x1='0%' y1='0%' x2='100%' y2='100%'>
+      <stop offset='0%' stop-color='#FFF8E1'/><stop offset='50%' stop-color='#FFE082'/><stop offset='100%' stop-color='#FFB74D'/>
+    </linearGradient>
+    <filter id='dropS'><feDropShadow dx='0' dy='6' stdDeviation='8' flood-color='#000' flood-opacity='0.2'/></filter>
+  </defs>
+  <!-- Roll body -->
+  <rect x='70' y='140' width='260' height='120' rx='60' fill='url(#tortilla)' filter='url(#dropS)' transform='rotate(-15 200 200)'/>
+  <!-- Grill stripes -->
+  <g stroke='#8D6E63' stroke-width='6' stroke-linecap='round' opacity='0.6'>
+    <line x1='120' y1='120' x2='140' y2='250'/>
+    <line x1='165' y1='110' x2='185' y2='240'/>
+    <line x1='210' y1='100' x2='230' y2='230'/>
+    <line x1='255' y1='90' x2='275' y2='220'/>
+  </g>
+  <!-- Cut corner showing filling -->
+  <ellipse cx='305' cy='140' rx='35' ry='45' fill='#C62828' transform='rotate(-15 305 140)'/>
+  <ellipse cx='305' cy='140' rx='28' ry='36' fill='#FBC02D' transform='rotate(-15 305 140)'/>
+  <ellipse cx='305' cy='140' rx='18' ry='24' fill='#43A047' transform='rotate(-15 305 140)'/>
+</svg>

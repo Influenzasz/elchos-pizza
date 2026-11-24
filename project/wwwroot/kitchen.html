@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кухня KDS — Экран Повара Elcho's Pizza</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍🍳</text></svg>">
+    <script src="/js/rbac.js"></script>
+    <style>
+        body {
+            background: #0A0F1A;
+            color: #F8FAFC;
+            font-family: var(--font-sans);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* ───── HEADER ───── */
+        .kds-header {
+            background: rgba(15,23,42,0.95);
+            border-bottom: 2px solid #1E293B;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+        .kds-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            font-weight: 900;
+        }
+        .kds-live-pill {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10B981;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .kds-sound-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #F8FAFC;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .kds-sound-btn:hover { background: rgba(255,255,255,0.15); }
+        .kds-sound-btn.muted { opacity: 0.45; }
+
+        /* ───── STATS BAR ───── */
+        .kds-stats-bar {
+            background: rgba(15,23,42,0.85);
+            border-bottom: 1px solid #1E293B;
+            padding: 8px 20px;
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .kds-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .kds-stat-value {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #FBBF24;
+            line-height: 1;
+        }
+        .kds-stat-label {
+            font-size: 0.65rem;
+            color: #64748B;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .kds-stat-divider {
+            width: 1px;
+            height: 32px;
+            background: #1E293B;
+        }
+
+        /* ───── BODY / GRID ───── */
+        .kds-body {
+            flex-grow: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .kds-column {
+            background: #0D1526;
+            border-radius: 16px;
+            border: 1px solid #1F2937;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: calc(100vh - 150px);
+        }
+        .kds-col-header {
+            padding: 12px 16px;
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1F2937;
+        }
+        .kds-col-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .kds-col-items-badge {
+            font-size: 0.65rem;
+            color: #9CA3AF;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kds-col-new {
+            border-top: 4px solid #EF4444;
+        }
+        .kds-col-new .kds-col-header { background: rgba(239,68,68,0.07); }
+
+        .kds-col-cooking {
+            border-top: 4px solid #3B82F6;
+        }
+        .kds-col-cooking .kds-col-header { background: rgba(59,130,246,0.07); }
+
+        .kds-col-oven {
+            border-top: 4px solid #F59E0B;
+        }
+        .kds-col-oven .kds-col-header { background: rgba(245,158,11,0.07); }
+
+        .kds-cards-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* ───── ORDER CARDS ───── */
+        .kds-order-card {
+            background: #1A2235;
+            border-radius: 12px;
+            border: 1px solid #2D3748;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .kds-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid #2D3748;
+            padding-bottom: 8px;
+        }
+        .kds-ord-num {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #FBBF24;
+        }
+        .kds-ord-type {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #2D3748;
+            color: #9CA3AF;
+        }
+        .kds-timer {
+            font-size: 0.9rem;
+            font-weight: 800;
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: #2D3748;
+        }
+        .timer-green { color: #10B981; }
+        .timer-yellow { color: #F59E0B; }
+        .timer-red { color: #EF4444; animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ───── COOK PROGRESS BAR ───── */
+        .kds-progress-wrap {
+            height: 6px;
+            background: #0A0F1A;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .kds-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #10B981, #FBBF24, #EF4444);
+            background-size: 300% 100%;
+            transition: width 1s linear;
+            animation: progressShimmer 3s linear infinite;
+        }
+        @keyframes progressShimmer {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* ───── ITEMS ───── */
+        .kds-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+        .kds-item-row {
+            display: flex;
+            flex-direction: column;
+            background: #111827;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border-left: 3px solid #FF6900;
+        }
+        .kds-item-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+        }
+        .kds-item-toppings {
+            font-size: 0.8rem;
+            color: #FBBF24;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+        .kds-item-sub {
+            font-size: 0.75rem;
+            color: #9CA3AF;
+        }
+
+        /* ───── ACTION BUTTONS ───── */
+        .kds-btn-action {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .btn-work { background: #3B82F6; color: white; }
+        .btn-work:hover { background: #2563EB; }
+        .btn-oven { background: #F59E0B; color: #111827; }
+        .btn-oven:hover { background: #D97706; }
+        .btn-ready { background: #10B981; color: white; }
+        .btn-ready:hover { background: #059669; }
+    </style>
+</head>
+<body>
+
+    <header class="kds-header">
+        <div class="kds-title">
+            <span style="font-size:1.5rem;">👨‍🍳</span>
+            <span>Кухня KDS — Elcho's Pizza</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div class="kds-live-pill">
+                <span class="pos-status-dot"></span>
+                SSE активна
+            </div>
+            <button class="kds-sound-btn" id="soundToggleBtn" onclick="toggleSound()" title="Звук оповещений">🔔 Звук</button>
+            <a href="/board" class="defense-pill" target="_blank">📺 Табло</a>
+            <a href="/pos" class="defense-pill" target="_blank">🖥️ Касса</a>
+            <a href="/" class="defense-pill">🌐 Сайт</a>
+        </div>
+    </header>
+
+    <!-- TOP STATS BAR -->
+    <div class="kds-stats-bar">
+        <div class="kds-stat-item">
+            <div class="kds-stat-value" id="statOrdersToday">0</div>
+            <div class="kds-stat-label">Заказов сегодня</div>
+        </div>
+        <div class="kds-stat-divider"></div>
+        <div class="kds-stat-item">
+            <div class="kds-stat-value" id="statAvgCook">—</div>
+            <div class="kds-stat-label">Среднее время</div>
+        </div>
+        <div class="kds-stat-divider"></div>
+        <div class="kds-stat-item">
+            <div class="kds-stat-value" id="statInProgress">0</div>
+            <div class="kds-stat-label">В работе</div>
+        </div>
+        <div class="kds-stat-divider"></div>
+        <div class="kds-stat-item">
+            <div class="kds-stat-value" id="statCompleted" style="color:#10B981;">0</div>
+            <div class="kds-stat-label">Выдано</div>
+        </div>
+    </div>
+
+    <main class="kds-body">
+        <!-- 1. НОВЫЕ ЗАКАЗЫ -->
+        <div class="kds-column kds-col-new">
+            <div class="kds-col-header" style="color: #EF4444;">
+                <div class="kds-col-header-left">
+                    <span>🔴 НОВЫЕ</span>
+                    <span class="kds-col-items-badge" id="itemsCountCreated">ВСЕГО ПОЗИЦИЙ: 0</span>
+                </div>
+                <span id="countCreated" class="cart-badge" style="background:#EF4444; color:white;">0</span>
+            </div>
+            <div class="kds-cards-list" id="listCreated"></div>
+        </div>
+
+        <!-- 2. ГОТОВИТСЯ -->
+        <div class="kds-column kds-col-cooking">
+            <div class="kds-col-header" style="color: #3B82F6;">
+                <div class="kds-col-header-left">
+                    <span>🔵 ГОТОВИТСЯ</span>
+                    <span class="kds-col-items-badge" id="itemsCountCooking">ВСЕГО ПОЗИЦИЙ: 0</span>
+                </div>
+                <span id="countCooking" class="cart-badge" style="background:#3B82F6; color:white;">0</span>
+            </div>
+            <div class="kds-cards-list" id="listCooking"></div>
+        </div>
+
+        <!-- 3. В ПЕЧИ -->
+        <div class="kds-column kds-col-oven">
+            <div class="kds-col-header" style="color: #F59E0B;">
+                <div class="kds-col-header-left">
+                    <span>🟡 В ПЕЧИ</span>
+                    <span class="kds-col-items-badge" id="itemsCountOven">ВСЕГО ПОЗИЦИЙ: 0</span>
+                </div>
+                <span id="countOven" class="cart-badge" style="background:#F59E0B; color:black;">0</span>
+            </div>
+            <div class="kds-cards-list" id="listOven"></div>
+        </div>
+    </main>
+
+    <!-- МОДАЛЬНОЕ ОКНО ТЕХНОЛОГИЧЕСКОЙ КАРТЫ -->
+    <div class="modal-overlay" id="techCardModal" onclick="if(event.target === this) closeModal('techCardModal')">
+        <div class="modal-window" style="background:#1E293B; color:white; max-width:460px;">
+            <div class="modal-header" style="border-color:#334155;">
+                <h3 id="tcTitle" style="display:flex; align-items:center; gap:8px;">📖 Технологическая карта</h3>
+                <button class="btn-close" onclick="closeModal('techCardModal')" style="color:#94A3B8;">✕</button>
+            </div>
+            <div class="modal-body" id="tcContent"></div>
+            <div class="modal-footer" style="border-color:#334155;">
+                <button class="kds-btn-action btn-ready" onclick="closeModal('techCardModal')">
+                    Понятно, готовим по стандарту! 👨‍🍳
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        ElchosRBAC.enforce(['Chef', 'Admin'], 'Кухонный дисплей KDS');
+
+        let kitchenOrders = [];
+        let soundEnabled = true;
+        let statCompletedCount = 0;
+
+        // Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playKitchenAlert() {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } catch (e) { }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundToggleBtn');
+            btn.textContent = soundEnabled ? '🔔 Звук' : '🔇 Тихо';
+            btn.classList.toggle('muted', !soundEnabled);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadKitchenOrders();
+            initEventSource();
+            setInterval(updateTimers, 1000);
+        });
+
+        function initEventSource() {
+            try {
+                const evtSource = new EventSource('/api/events');
+                evtSource.onmessage = (e) => {
+                    try {
+                        const msg = JSON.parse(e.data);
+                        if (msg.type === 'order_created' || msg.type === 'order_status_updated') {
+                            loadKitchenOrders();
+                            if (msg.type === 'order_created') playKitchenAlert();
+                        }
+                    } catch (err) { }
+                };
+            } catch (e) { }
+        }
+
+        async function loadKitchenOrders() {
+            try {
+                kitchenOrders = await fetch('/api/orders/kitchen').then(r => r.json());
+                renderColumns();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function countItems(orders) {
+            return orders.reduce((sum, o) => sum + (o.items || []).reduce((s2, it) => s2 + it.Quantity, 0), 0);
+        }
+
+        function renderColumns() {
+            const listCreated = document.getElementById('listCreated');
+            const listCooking = document.getElementById('listCooking');
+            const listOven    = document.getElementById('listOven');
+
+            const created = kitchenOrders.filter(o => o.Status === 'Created');
+            const cooking = kitchenOrders.filter(o => o.Status === 'Cooking');
+            const oven    = kitchenOrders.filter(o => o.Status === 'Oven');
+
+            document.getElementById('countCreated').textContent = created.length;
+            document.getElementById('countCooking').textContent = cooking.length;
+            document.getElementById('countOven').textContent    = oven.length;
+
+            document.getElementById('itemsCountCreated').textContent = `ВСЕГО ПОЗИЦИЙ: ${countItems(created)}`;
+            document.getElementById('itemsCountCooking').textContent = `ВСЕГО ПОЗИЦИЙ: ${countItems(cooking)}`;
+            document.getElementById('itemsCountOven').textContent    = `ВСЕГО ПОЗИЦИЙ: ${countItems(oven)}`;
+
+            listCreated.innerHTML = created.map(o => renderKdsCard(o, 'Cooking', 'Взять в работу 👨‍🍳', 'btn-work')).join('') || '<div style="color:#6B7280; text-align:center; padding:20px;">Очередь чиста</div>';
+            listCooking.innerHTML = cooking.map(o => renderKdsCard(o, 'Oven',    'Отправить в печь 🔥', 'btn-oven')).join('') || '<div style="color:#6B7280; text-align:center; padding:20px;">Нет пицц на сборке</div>';
+            listOven.innerHTML    = oven.map(o    => renderKdsCard(o, 'Ready',   'Готово к выдаче! ✅', 'btn-ready')).join('') || '<div style="color:#6B7280; text-align:center; padding:20px;">Печь свободна</div>';
+
+            // Stats
+            const inProgress = cooking.length + oven.length;
+            document.getElementById('statInProgress').textContent  = inProgress;
+            document.getElementById('statOrdersToday').textContent = kitchenOrders.length;
+
+            updateTimers();
+        }
+
+        function renderKdsCard(order, nextStatus, nextLabel, btnClass) {
+            const items = order.items || [];
+            const totalItems = items.reduce((s, it) => s + it.Quantity, 0);
+            const typeRu = order.OrderType === 'Delivery' ? '🛵 Доставка' : (order.OrderType === 'DineIn' ? '🍽️ В зале' : '🛍️ С собой');
+
+            // Progress bar width based on target cook time (12 min = full)
+            const targetSec = 12 * 60;
+            const createdMs = new Date(order.CreatedAt).getTime();
+            const elapsedSec = Math.floor((Date.now() - createdMs) / 1000);
+            const pct = Math.min(100, Math.round((elapsedSec / targetSec) * 100));
+
+            return `
+                <div class="kds-order-card" data-created="${order.CreatedAt}">
+                    <div class="kds-card-head">
+                        <div>
+                            <span class="kds-ord-num">${order.OrderNumber}</span>
+                            <span class="kds-ord-type" style="margin-left:8px;">${typeRu}</span>
+                        </div>
+                        <span class="kds-timer timer-green" id="timer-${order.Id}">0:00</span>
+                    </div>
+
+                    <!-- Cook time progress bar -->
+                    <div class="kds-progress-wrap">
+                        <div class="kds-progress-bar" id="prog-${order.Id}" style="width:${pct}%"></div>
+                    </div>
+
+                    <div class="kds-items-list">
+                        ${items.map(it => {
+                            let toppingsArr = [];
+                            try { toppingsArr = JSON.parse(it.SelectedToppings || '[]'); } catch(e){}
+                            const toppingsStr = toppingsArr.length ? `★ ДОБАВКИ: ${toppingsArr.join(', ')}` : '';
+                            const metaStr = it.SizeName ? `${it.SizeName} • ${it.DoughName || ''}` : '';
+
+                            return `
+                                <div class="kds-item-row">
+                                    <div class="kds-item-title">
+                                        <span>${it.ProductName}</span>
+                                        <span style="color:#FF6900;">x${it.Quantity}</span>
+                                    </div>
+                                    ${metaStr ? `<div class="kds-item-sub">${metaStr}</div>` : ''}
+                                    ${toppingsStr ? `<div class="kds-item-toppings">${toppingsStr}</div>` : ''}
+                                    <div style="margin-top:5px;">
+                                        <button onclick="openTechCard('${it.ProductName.replace(/'/g, "\\'")}', '${(it.SizeName || 'Средняя 30 см').replace(/'/g, "\\'")}')" style="background:#1F2937; border:1px solid #4B5563; color:#9CA3AF; padding:3px 8px; border-radius:6px; font-size:0.72rem; font-weight:700; cursor:pointer;">
+                                            📖 Техкарта
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <button class="kds-btn-action ${btnClass}" onclick="updateStatus(${order.Id}, '${nextStatus}')">
+                        ${nextLabel}
+                    </button>
+                </div>
+            `;
+        }
+
+        async function updateStatus(orderId, newStatus) {
+            try {
+                await fetch(`/api/orders/${orderId}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (newStatus === 'Ready') statCompletedCount++;
+                document.getElementById('statCompleted').textContent = statCompletedCount;
+                await loadKitchenOrders();
+            } catch (err) {
+                alert('Ошибка обновления статуса');
+            }
+        }
+
+        function updateTimers() {
+            kitchenOrders.forEach(ord => {
+                const el = document.getElementById(`timer-${ord.Id}`);
+                const prog = document.getElementById(`prog-${ord.Id}`);
+                if (!el) return;
+
+                const created = new Date(ord.CreatedAt);
+                const diffSec = Math.floor((new Date() - created) / 1000);
+                const mins = Math.floor(diffSec / 60);
+                const secs = diffSec % 60;
+                el.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+                el.className = 'kds-timer';
+                if (mins < 7)       el.classList.add('timer-green');
+                else if (mins < 12) el.classList.add('timer-yellow');
+                else                el.classList.add('timer-red');
+
+                if (prog) {
+                    const targetSec = 12 * 60;
+                    const pct = Math.min(100, Math.round((diffSec / targetSec) * 100));
+                    prog.style.width = pct + '%';
+                }
+
+                // Update avg cook time stat
+                if (mins > 0) {
+                    document.getElementById('statAvgCook').textContent = `${mins} мин`;
+                }
+            });
+        }
+
+        function openTechCard(productName, sizeName) {
+            let diam = 30;
+            if (sizeName.includes('25') || sizeName.toLowerCase().includes('маленькая')) diam = 25;
+            else if (sizeName.includes('35') || sizeName.toLowerCase().includes('большая')) diam = 35;
+
+            const doughWeight  = diam === 25 ? 220 : (diam === 30 ? 330 : 450);
+            const sauceWeight  = diam === 25 ? 60  : (diam === 30 ? 90  : 120);
+            const cheeseWeight = diam === 25 ? 90  : (diam === 30 ? 130 : 170);
+            const slices       = diam === 25 ? 6   : 8;
+
+            let specificToppings = '';
+            const lower = productName.toLowerCase();
+            if (lower.includes('пепперони')) {
+                const slicesCount = diam === 25 ? 16 : (diam === 30 ? 24 : 32);
+                specificToppings = `<li><strong>Колбаса Пепперони острая:</strong> ${slicesCount} слайсов (выкладывать равномерно по спирали)</li>`;
+            } else if (lower.includes('ветчин')) {
+                const hamW = diam === 25 ? 50 : (diam === 30 ? 75 : 100);
+                const mushW = diam === 25 ? 30 : (diam === 30 ? 45 : 60);
+                specificToppings = `
+                    <li><strong>Ветчина сочная мясная:</strong> ${hamW} г (кубики/слайсы)</li>
+                    <li><strong>Шампиньоны свежие:</strong> ${mushW} г (тонкие слайсы поверх сыра)</li>
+                `;
+            } else if (lower.includes('сыр')) {
+                const ched = diam === 25 ? 30 : (diam === 30 ? 45 : 60);
+                const parm = diam === 25 ? 15 : (diam === 30 ? 20 : 30);
+                specificToppings = `
+                    <li><strong>Сыр Чеддер тертый:</strong> ${ched} г</li>
+                    <li><strong>Сыр Пармезан выдержанный:</strong> ${parm} г (посыпка)</li>
+                    <li><strong>Итальянские травы:</strong> 2 г (орегано, базилик)</li>
+                `;
+            } else if (lower.includes('цыплен') || lower.includes('барбекю')) {
+                const chkW = diam === 25 ? 50 : (diam === 30 ? 75 : 100);
+                specificToppings = `
+                    <li><strong>Филе цыпленка су-вид:</strong> ${chkW} г</li>
+                    <li><strong>Лук красный свежий:</strong> 20 г (полукольца)</li>
+                    <li><strong>Соус Барбекю фирменный:</strong> полив спиралью поверх сыра</li>
+                `;
+            } else {
+                specificToppings = `<li><strong>Мясная/Овощная начинка:</strong> согласно стандартам Elcho's Pizza для ${diam} см</li>`;
+            }
+
+            document.getElementById('tcTitle').textContent = `📖 Техкарта: ${productName} (${diam} см)`;
+            document.getElementById('tcContent').innerHTML = `
+                <div style="background:#0F172A; padding:16px; border-radius:12px; border:1px solid #334155; font-size:0.92rem; line-height:1.6;">
+                    <div style="color:#FF6900; font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+                        Стандартная рецептура на ${diam} см (диаметр)
+                    </div>
+                    <ul style="padding-left:20px; margin:0 0 12px; color:#E2E8F0;">
+                        <li><strong>Тесто (шар):</strong> ${doughWeight} г (раскатка бортика до 1.5 см)</li>
+                        <li><strong>Фирменный томатный соус:</strong> ${sauceWeight} г (равномерный слой, отступ 1.5 см)</li>
+                        <li><strong>Сыр Моцарелла:</strong> ${cheeseWeight} г (100% покрытие соуса)</li>
+                        ${specificToppings}
+                    </ul>
+                    <div style="border-top:1px dashed #334155; margin:12px 0;"></div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div style="background:#1E293B; padding:10px; border-radius:8px;">
+                            <div style="color:#94A3B8; font-size:0.75rem;">ТЕМПЕРАТУРА ПЕЧИ</div>
+                            <div style="color:#F59E0B; font-weight:800; font-size:1.1rem;">🔥 300°C</div>
+                        </div>
+                        <div style="background:#1E293B; padding:10px; border-radius:8px;">
+                            <div style="color:#94A3B8; font-size:0.75rem;">ВРЕМЯ ВЫПЕКАНИЯ</div>
+                            <div style="color:#10B981; font-weight:800; font-size:1.1rem;">⏱️ 4 мин 30 сек</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px; background:#1E293B; padding:10px; border-radius:8px; font-size:0.8rem; color:#94A3B8;">
+                        ✂️ Нарезка: на <strong>${slices} равных слайсов</strong> круглым ножом от центра к краю.
+                    </div>
+                </div>
+            `;
+            document.getElementById('techCardModal').classList.add('open');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+    </script>
+</body>
+</html>

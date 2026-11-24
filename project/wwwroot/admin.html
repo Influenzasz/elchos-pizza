@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель Управления — Elcho's Pizza Enterprise</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    <script src="/js/rbac.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #F1F5F9;
+            color: #0F172A;
+            font-family: 'Nunito', 'Inter', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ══════════════════════════════════
+           SIDEBAR
+        ══════════════════════════════════ */
+        .admin-sidebar {
+            width: 260px;
+            min-width: 260px;
+            background: #0F172A;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            transition: width 0.3s ease, min-width 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+        .admin-sidebar.collapsed {
+            width: 72px;
+            min-width: 72px;
+        }
+        .sidebar-logo {
+            padding: 20px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FF6900, #C85000);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(255,105,0,0.4);
+        }
+        .sidebar-logo-text {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .sidebar-logo-text strong {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+        }
+        .sidebar-logo-text span {
+            font-size: 0.72rem;
+            color: #64748B;
+            font-weight: 600;
+        }
+        .admin-sidebar.collapsed .sidebar-logo-text,
+        .admin-sidebar.collapsed .sidebar-nav-label {
+            display: none;
+        }
+        .sidebar-toggle {
+            position: absolute;
+            top: 22px;
+            right: -14px;
+            width: 28px;
+            height: 28px;
+            background: #1E293B;
+            border: 2px solid #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #94A3B8;
+            transition: all 0.2s;
+            z-index: 11;
+        }
+        .sidebar-toggle:hover { background: #FF6900; color: white; border-color: #FF6900; }
+
+        .sidebar-nav {
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex-grow: 1;
+        }
+        .sidebar-section-title {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #475569;
+            letter-spacing: 1px;
+            padding: 10px 10px 4px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .admin-sidebar.collapsed .sidebar-section-title { opacity: 0; }
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            color: #94A3B8;
+            font-size: 0.9rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar-nav-item .nav-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            width: 22px;
+            text-align: center;
+        }
+        .sidebar-nav-item:hover {
+            background: rgba(255,255,255,0.06);
+            color: white;
+        }
+        .sidebar-nav-item.active {
+            background: rgba(255, 105, 0, 0.15);
+            color: #FF6900;
+        }
+        .sidebar-nav-item.active .nav-icon { filter: drop-shadow(0 0 6px rgba(255,105,0,0.5)); }
+
+        .sidebar-footer {
+            padding: 14px 10px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .sidebar-quick-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: #64748B;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: color 0.15s, background 0.15s;
+        }
+        .sidebar-quick-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar.collapsed .sidebar-quick-link span { display: none; }
+
+        /* ══════════════════════════════════
+           MAIN AREA
+        ══════════════════════════════════ */
+        .admin-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .admin-topbar {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+        .topbar-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #0F172A;
+        }
+        .topbar-subtitle {
+            font-size: 0.8rem;
+            color: #64748B;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .topbar-clock {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #0F172A;
+            font-variant-numeric: tabular-nums;
+            background: #F1F5F9;
+            padding: 6px 14px;
+            border-radius: 8px;
+        }
+        .btn-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #F1F5F9;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .btn-refresh:hover { background: #E2E8F0; }
+
+        .admin-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+        }
+
+        /* ══════════════════════════════════
+           KPI CARDS
+        ══════════════════════════════════ */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 4px 0 0 4px;
+        }
+        .kpi-card.green::before { background: #10B981; }
+        .kpi-card.orange::before { background: #FF6900; }
+        .kpi-card.blue::before { background: #3B82F6; }
+        .kpi-card.amber::before { background: #F59E0B; }
+
+        .kpi-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+        .kpi-icon {
+            font-size: 1.8rem;
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .kpi-icon.green { background: #ECFDF5; }
+        .kpi-icon.orange { background: #FFF0E6; }
+        .kpi-icon.blue { background: #EFF6FF; }
+        .kpi-icon.amber { background: #FFFBEB; }
+
+        .kpi-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 50px;
+        }
+        .kpi-trend.up { background: #ECFDF5; color: #15803D; }
+        .kpi-trend.down { background: #FEF2F2; color: #B91C1C; }
+        .kpi-trend.neutral { background: #F1F5F9; color: #64748B; }
+
+        .kpi-lbl {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .kpi-val {
+            font-size: 1.9rem;
+            font-weight: 900;
+            color: #0F172A;
+            line-height: 1;
+        }
+        .kpi-sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 28px;
+        }
+        .spark-bar {
+            flex: 1;
+            border-radius: 2px;
+            background: #E2E8F0;
+            transition: height 0.5s ease;
+        }
+        .kpi-card.green .spark-bar.active { background: #10B981; }
+        .kpi-card.orange .spark-bar.active { background: #FF6900; }
+        .kpi-card.blue .spark-bar.active { background: #3B82F6; }
+        .kpi-card.amber .spark-bar.active { background: #F59E0B; }
+
+        /* ══════════════════════════════════
+           TABLE CARD
+        ══════════════════════════════════ */
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+        .table-card-head {
+            padding: 18px 24px;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-card-head h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #0F172A;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        table.data-table th {
+            background: #F8FAFC;
+            padding: 10px 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #E2E8F0;
+            text-align: left;
+        }
+        table.data-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid #F1F5F9;
+            vertical-align: middle;
+        }
+        table.data-table tr:last-child td { border-bottom: none; }
+        table.data-table tr:hover td { background: #FAFAFA; }
+
+        /* ══════════════════════════════════
+           BUTTONS
+        ══════════════════════════════════ */
+        .btn-table {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+        .btn-toggle-on { background: #DCFCE7; color: #15803D; }
+        .btn-toggle-on:hover { background: #BBF7D0; }
+        .btn-toggle-off { background: #FEE2E2; color: #B91C1C; }
+        .btn-toggle-off:hover { background: #FCA5A5; }
+        .btn-action-edit { background: #E0E7FF; color: #4338CA; margin-right: 4px; }
+        .btn-action-del { background: #FEE2E2; color: #B91C1C; }
+        .btn-add-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            background: #FF6900;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-add-primary:hover { background: #E05D00; }
+
+        /* Status badges for orders */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+        .status-created { background: #F1F5F9; color: #475569; }
+        .status-cooking { background: #EFF6FF; color: #1D4ED8; }
+        .status-oven { background: #FFFBEB; color: #B45309; }
+        .status-ready { background: #ECFDF5; color: #15803D; }
+        .status-ontheway { background: #FFF0E6; color: #C2410C; }
+        .status-delivered { background: #F0FDF4; color: #166534; }
+        .status-cancelled { background: #FEF2F2; color: #991B1B; }
+
+        /* ══════════════════════════════════
+           STOCK BARS
+        ══════════════════════════════════ */
+        .stock-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stock-bar-track {
+            flex: 1;
+            height: 7px;
+            background: #E2E8F0;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        .stock-bar-fill {
+            height: 100%;
+            border-radius: 50px;
+            transition: width 0.5s ease;
+        }
+        .stock-bar-fill.ok { background: linear-gradient(90deg, #10B981, #34D399); }
+        .stock-bar-fill.low { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+        .stock-bar-fill.critical { background: linear-gradient(90deg, #EF4444, #F87171); }
+        .stock-pct { font-size: 0.75rem; font-weight: 800; min-width: 32px; text-align: right; }
+        .stock-pct.ok { color: #10B981; }
+        .stock-pct.low { color: #F59E0B; }
+        .stock-pct.critical { color: #EF4444; }
+
+        .stock-badge-low {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #FEE2E2;
+            color: #B91C1C;
+            font-weight: 800;
+            font-size: 0.72rem;
+            padding: 3px 9px;
+            border-radius: 6px;
+        }
+        .stock-badge-ok {
+            background: #DCFCE7;
+            color: #15803D;
+            font-weight: 700;
+            font-size: 0.72rem;
+            padding: 3px 9px;
+            border-radius: 6px;
+        }
+
+        /* ══════════════════════════════════
+           ANALYTICS SECTION
+        ══════════════════════════════════ */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 22px;
+        }
+
+        /* CSS Bar Chart */
+        .bar-chart {
+            padding: 0 24px 20px;
+        }
+        .bar-chart-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .bar-chart-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #64748B;
+            min-width: 80px;
+            text-align: right;
+        }
+        .bar-chart-track {
+            flex: 1;
+            height: 28px;
+            background: #F1F5F9;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        .bar-chart-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6900, #FBBF24);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding-right: 10px;
+            justify-content: flex-end;
+            transition: width 0.7s ease;
+            min-width: 36px;
+        }
+        .bar-chart-val {
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* Top 5 bestsellers */
+        .top5-list {
+            padding: 0 24px 20px;
+        }
+        .top5-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        .top5-item:last-child { border-bottom: none; }
+        .top5-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .rank-1 { background: #FEF9C3; color: #A16207; }
+        .rank-2 { background: #F1F5F9; color: #475569; }
+        .rank-3 { background: #FFF7ED; color: #C2410C; }
+        .rank-other { background: #F8FAFC; color: #94A3B8; }
+        .top5-name { flex: 1; font-size: 0.88rem; font-weight: 700; }
+        .top5-qty { font-size: 0.8rem; color: #64748B; }
+        .top5-rev { font-size: 0.88rem; font-weight: 800; color: #10B981; }
+
+        /* Alert box */
+        .alert-card {
+            border-left: 4px solid;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .alert-card.danger {
+            border-color: #EF4444;
+            background: #FEF2F2;
+        }
+        .alert-card.warning {
+            border-color: #F59E0B;
+            background: #FFFBEB;
+        }
+
+        /* ══════════════════════════════════
+           FILTER BUTTONS
+        ══════════════════════════════════ */
+        .filter-bar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: 1.5px solid #E2E8F0;
+            background: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            border-color: #FF6900;
+            color: #FF6900;
+            background: #FFF0E6;
+        }
+
+        /* ══════════════════════════════════
+           SHIFTS section
+        ══════════════════════════════════ */
+        .shift-open-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #ECFDF5;
+            color: #15803D;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+        .shift-open-pill::before {
+            content: '';
+            width: 7px; height: 7px;
+            background: #10B981;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* ══════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════ */
+        @media (max-width: 1100px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .analytics-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ════════════════════════════════════
+         SIDEBAR
+    ════════════════════════════════════ -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">📊</div>
+            <div class="sidebar-logo-text">
+                <strong>Elcho's Pizza</strong>
+                <span>ERP / WMS Система</span>
+            </div>
+        </div>
+        <div class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle">◀</div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-title">Главное</div>
+
+            <button class="sidebar-nav-item active" id="navBtn-analytics" onclick="switchAdminTab('analytics')">
+                <span class="nav-icon">📈</span>
+                <span class="sidebar-nav-label">Аналитика</span>
+            </button>
+            <button class="sidebar-nav-item" id="navBtn-orders" onclick="switchAdminTab('orders')">
+                <span class="nav-icon">📋</span>
+                <span class="sidebar-nav-label">Реестр заказов</span>
+            </button>
+            <button class="sidebar-nav-item" id="navBtn-menu" onclick="switchAdminTab('menu')">
+                <span class="nav-icon">🍕</span>
+                <span class="sidebar-nav-label">Меню и цены</span>
+            </button>
+
+            <div class="sidebar-section-title">Склад и финансы</div>
+            <button class="sidebar-nav-item" id="navBtn-inventory" onclick="switchAdminTab('inventory')">
+                <span class="nav-icon">📦</span>
+                <span class="sidebar-nav-label">Склад ингредиентов</span>
+            </button>
+            <button class="sidebar-nav-item" id="navBtn-shifts" onclick="switchAdminTab('shifts')">
+                <span class="nav-icon">💼</span>
+                <span class="sidebar-nav-label">Кассовые смены</span>
+            </button>
+
+            <div class="sidebar-section-title">Качество</div>
+            <button class="sidebar-nav-item" id="navBtn-reviews" onclick="switchAdminTab('reviews')">
+                <span class="nav-icon">⭐</span>
+                <span class="sidebar-nav-label">Отзывы гостей</span>
+            </button>
+            <button class="sidebar-nav-item" id="navBtn-logs" onclick="switchAdminTab('logs')">
+                <span class="nav-icon">🛡️</span>
+                <span class="sidebar-nav-label">Журнал аудита</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="/" class="sidebar-quick-link" target="_blank">
+                <span>🍕</span><span>Сайт клиентов</span>
+            </a>
+            <a href="/pos" class="sidebar-quick-link" target="_blank">
+                <span>🖥️</span><span>Касса POS</span>
+            </a>
+            <a href="/kitchen" class="sidebar-quick-link" target="_blank">
+                <span>👨‍🍳</span><span>Кухня KDS</span>
+            </a>
+            <a href="/courier" class="sidebar-quick-link" target="_blank">
+                <span>🛵</span><span>Курьер</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ════════════════════════════════════
+         MAIN
+    ════════════════════════════════════ -->
+    <div class="admin-main">
+
+        <!-- TOP BAR -->
+        <header class="admin-topbar">
+            <div>
+                <div class="topbar-title" id="adminPageTitle">📈 Аналитика и продажи</div>
+                <div class="topbar-subtitle">ООО «Элчос Пицца» — Центр управления предприятием</div>
+            </div>
+            <div class="topbar-actions">
+                <div class="topbar-clock" id="adminClock">00:00:00</div>
+                <button class="btn-refresh" onclick="refreshCurrentTab()">🔄 Обновить</button>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="admin-content">
+
+            <!-- KPI CARDS (везде видны) -->
+            <div class="kpi-grid" id="kpiGrid">
+                <div class="kpi-card green">
+                    <div class="kpi-top">
+                        <div class="kpi-icon green">💰</div>
+                        <span class="kpi-trend up" id="revTrend">↑ сегодня</span>
+                    </div>
+                    <div>
+                        <div class="kpi-lbl">Выручка за сегодня</div>
+                        <div class="kpi-val" id="kpiRevenue">0 ₽</div>
+                    </div>
+                    <div class="kpi-sparkline" id="spark-rev"></div>
+                </div>
+                <div class="kpi-card orange">
+                    <div class="kpi-top">
+                        <div class="kpi-icon orange">🧾</div>
+                        <span class="kpi-trend neutral" id="ordTrend">за сегодня</span>
+                    </div>
+                    <div>
+                        <div class="kpi-lbl">Заказов за сегодня</div>
+                        <div class="kpi-val" id="kpiOrders">0</div>
+                    </div>
+                    <div class="kpi-sparkline" id="spark-ord"></div>
+                </div>
+                <div class="kpi-card blue">
+                    <div class="kpi-top">
+                        <div class="kpi-icon blue">📊</div>
+                        <span class="kpi-trend neutral">на заказ</span>
+                    </div>
+                    <div>
+                        <div class="kpi-lbl">Средний чек</div>
+                        <div class="kpi-val" id="kpiAvgCheck">0 ₽</div>
+                    </div>
+                    <div class="kpi-sparkline" id="spark-avg"></div>
+                </div>
+                <div class="kpi-card amber">
+                    <div class="kpi-top">
+                        <div class="kpi-icon amber">🔥</div>
+                        <span class="kpi-trend up" id="activeTrend">в работе</span>
+                    </div>
+                    <div>
+                        <div class="kpi-lbl">Активных заказов</div>
+                        <div class="kpi-val" id="kpiActive" style="color:#FF6900;">0</div>
+                    </div>
+                    <div class="kpi-sparkline" id="spark-act"></div>
+                </div>
+            </div>
+
+            <!-- SECTION: АНАЛИТИКА -->
+            <div id="section-analytics">
+                <div class="analytics-grid">
+                    <!-- Выручка по часам (CSS bar chart) -->
+                    <div class="table-card">
+                        <div class="table-card-head">
+                            <h3>📊 Выручка по часам (сегодня)</h3>
+                        </div>
+                        <div class="bar-chart" id="revenueBarChart">
+                            <div style="text-align:center;padding:30px;color:#94A3B8;">Загрузка...</div>
+                        </div>
+                    </div>
+
+                    <!-- ТОП-5 блюд -->
+                    <div class="table-card">
+                        <div class="table-card-head">
+                            <h3>🏆 Топ-5 блюд</h3>
+                        </div>
+                        <div class="top5-list" id="top5List">
+                            <div style="text-align:center;padding:30px;color:#94A3B8;">Загрузка...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Склад: предупреждения -->
+                <div class="table-card">
+                    <div class="table-card-head">
+                        <h3>⚠️ Складские предупреждения</h3>
+                    </div>
+                    <div style="padding:20px;" id="lowStockAlerts">Загрузка...</div>
+                </div>
+            </div>
+
+            <!-- SECTION: МЕНЮ -->
+            <div id="section-menu" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-head">
+                        <h3>🍕 Каталог меню и управление ценами</h3>
+                        <button class="btn-add-primary" onclick="openAddProductModal()">+ Добавить блюдо</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Фото</th>
+                                <th>Название</th>
+                                <th>Категория</th>
+                                <th>Цена</th>
+                                <th>Бейдж</th>
+                                <th>Наличие</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menuTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECTION: СКЛАД -->
+            <div id="section-inventory" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-head">
+                        <div>
+                            <h3>📦 Складской учёт ингредиентов</h3>
+                            <div style="font-size:0.8rem;color:#64748B;margin-top:2px;">Автоматическое списание по FIFO при каждом заказе</div>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Ингредиент</th>
+                                <th>Уровень запаса</th>
+                                <th>Остаток</th>
+                                <th>Минимум</th>
+                                <th>Себестоимость</th>
+                                <th>Статус</th>
+                                <th>Пополнение</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECTION: ЗАКАЗЫ -->
+            <div id="section-orders" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-head">
+                        <h3>📋 Все заказы системы</h3>
+                        <div class="filter-bar">
+                            <button class="filter-btn active" onclick="filterOrders(this, '')">Все</button>
+                            <button class="filter-btn" onclick="filterOrders(this, 'Created')">🆕 Новые</button>
+                            <button class="filter-btn" onclick="filterOrders(this, 'Cooking')">👨‍🍳 В готовке</button>
+                            <button class="filter-btn" onclick="filterOrders(this, 'Ready')">✅ Готовы</button>
+                            <button class="filter-btn" onclick="filterOrders(this, 'OnTheWay')">🛵 В пути</button>
+                            <button class="filter-btn" onclick="filterOrders(this, 'Delivered')">🎉 Доставлены</button>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>№ Заказа</th>
+                                <th>Тип</th>
+                                <th>Клиент</th>
+                                <th>Телефон / Адрес</th>
+                                <th>Сумма</th>
+                                <th>Оплата</th>
+                                <th>Статус</th>
+                                <th>Дата/Время</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECTION: СМЕНЫ -->
+            <div id="section-shifts" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-head">
+                        <div>
+                            <h3>💼 Фискальные кассовые смены (54-ФЗ)</h3>
+                            <div style="font-size:0.8rem;color:#64748B;margin-top:2px;">Журнал Z-отчётов и кассовой выручки</div>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>№ Смены</th>
+                                <th>Кассир</th>
+                                <th>Открытие</th>
+                                <th>Закрытие</th>
+                                <th>Заказов</th>
+                                <th>Наличные</th>
+                                <th>Безналичные</th>
+                                <th>Выручка смены</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shiftsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECTION: ОТЗЫВЫ -->
+            <div id="section-reviews" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-head">
+                        <div>
+                            <h3>⭐ Контроль качества и отзывы гостей</h3>
+                            <div style="font-size:0.8rem;color:#64748B;margin-top:2px;">Оценки через трекер заказов и приложение</div>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Заказ</th>
+                                <th>Имя</th>
+                                <th>Оценка</th>
+                                <th>Текст отзыва</th>
+                                <th>Дата и время</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECTION: АУДИТ -->
+            <div id="section-logs" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-head">
+                        <h3>🛡️ Журнал безопасности и активности (Аудит)</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Пользователь</th>
+                                <th>Действие</th>
+                                <th>Детали</th>
+                                <th>IP-адрес</th>
+                                <th>Время</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /admin-content -->
+    </div><!-- /admin-main -->
+
+    <!-- MODAL: добавить/редактировать блюдо -->
+    <div class="modal-overlay" id="productModal" onclick="if(event.target === this) closeModal('productModal')">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3 id="productModalTitle">Добавить блюдо в меню</h3>
+                <button class="btn-close" onclick="closeModal('productModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="prodEditId">
+                <div class="form-group">
+                    <label class="form-label">Название блюда *</label>
+                    <input type="text" class="form-control" id="prodEditName" placeholder="Пепперони Фреш">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Описание состава</label>
+                    <textarea class="form-control" id="prodEditDesc" rows="3" placeholder="Пикантная пепперони, томаты, сыр моцарелла..."></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div class="form-group">
+                        <label class="form-label">Категория</label>
+                        <select class="form-control" id="prodEditCat">
+                            <option value="1">Пиццы</option>
+                            <option value="2">Закуски</option>
+                            <option value="3">Десерты</option>
+                            <option value="4">Напитки</option>
+                            <option value="5">Соусы</option>
+                            <option value="6">Комбо</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Базовая цена (₽) *</label>
+                        <input type="number" class="form-control" id="prodEditPrice" placeholder="499">
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div class="form-group">
+                        <label class="form-label">Бейдж (Хит / Новинка)</label>
+                        <input type="text" class="form-control" id="prodEditBadge" placeholder="Хит">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Это пицца? (с размерами)</label>
+                        <select class="form-control" id="prodEditIsPizza">
+                            <option value="1">Да — Пицца</option>
+                            <option value="0">Нет — Обычный товар</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">URL фото блюда</label>
+                    <input type="text" class="form-control" id="prodEditImg" placeholder="https://...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-add-primary" onclick="saveProductSubmit()" style="width:100%;justify-content:center;padding:12px;font-size:1rem;">
+                    💾 Сохранить блюдо
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        ElchosRBAC.enforce(['Admin'], 'Панель Управления и Склад (ERP/WMS)');
+
+        // ── CLOCK ──
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('adminClock').textContent =
+                now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ── SIDEBAR TOGGLE ──
+        let sidebarCollapsed = false;
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            const sb = document.getElementById('adminSidebar');
+            const btn = document.getElementById('sidebarToggle');
+            sb.classList.toggle('collapsed', sidebarCollapsed);
+            btn.textContent = sidebarCollapsed ? '▶' : '◀';
+        }
+
+        // ── SPARKLINE builder ──
+        function renderSparkline(containerId, values, colorClass) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const max = Math.max(...values, 1);
+            container.innerHTML = values.map((v, i) => {
+                const h = Math.max(4, Math.round((v / max) * 28));
+                const isLast = i === values.length - 1;
+                return `<div class="spark-bar ${isLast ? 'active' : ''}" style="height:${h}px;"></div>`;
+            }).join('');
+        }
+
+        // ── SECTION SWITCH ──
+        const sectionTitles = {
+            analytics: '📈 Аналитика и продажи',
+            menu: '🍕 Меню и цены',
+            inventory: '📦 Склад ингредиентов',
+            orders: '📋 Реестр заказов',
+            shifts: '💼 Кассовые смены (54-ФЗ)',
+            reviews: '⭐ Отзывы гостей',
+            logs: '🛡️ Журнал аудита'
+        };
+        const allSections = ['analytics', 'menu', 'inventory', 'orders', 'shifts', 'reviews', 'logs'];
+
+        function switchAdminTab(tabName) {
+            allSections.forEach(sec => {
+                const el = document.getElementById(`section-${sec}`);
+                if (el) el.style.display = sec === tabName ? 'block' : 'none';
+            });
+            document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById(`navBtn-${tabName}`);
+            if (btn) btn.classList.add('active');
+            document.getElementById('adminPageTitle').textContent = sectionTitles[tabName] || tabName;
+        }
+
+        function refreshCurrentTab() {
+            loadAnalytics();
+            loadMenu();
+            loadInventory();
+            loadAllOrders();
+            loadShifts();
+            loadReviews();
+            loadLogs();
+        }
+
+        // ── LOAD ON START ──
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Promise.all([
+                loadAnalytics(),
+                loadMenu(),
+                loadInventory(),
+                loadAllOrders(),
+                loadShifts(),
+                loadReviews(),
+                loadLogs()
+            ]);
+        });
+
+        // ── ANALYTICS ──
+        async function loadAnalytics() {
+            try {
+                const data = await fetch('/api/analytics').then(r => r.json());
+                document.getElementById('kpiRevenue').textContent = `${data.todayRevenue || 0} ₽`;
+                document.getElementById('kpiOrders').textContent = data.todayOrders || 0;
+                document.getElementById('kpiAvgCheck').textContent = `${data.avgCheck || 0} ₽`;
+                document.getElementById('kpiActive').textContent = data.activeOrders || 0;
+
+                // Sparklines (генерим примерные данные если нет)
+                const ord = data.todayOrders || 0;
+                const revVal = data.todayRevenue || 0;
+                renderSparkline('spark-rev', [revVal*0.4, revVal*0.6, revVal*0.5, revVal*0.8, revVal*0.7, revVal*0.9, revVal]);
+                renderSparkline('spark-ord', [ord*0.3, ord*0.5, ord*0.4, ord*0.7, ord*0.6, ord*0.8, ord]);
+                renderSparkline('spark-avg', [1,2,2,3,2,3,3]);
+                renderSparkline('spark-act', [1,1,2,1,2,2,data.activeOrders||1]);
+
+                // Top products
+                const tops = data.topProducts || [];
+                if (tops.length) {
+                    const maxRev = tops[0].TotalRevenue || 1;
+                    // Bar chart по выручке
+                    document.getElementById('revenueBarChart').innerHTML = tops.map(p => `
+                        <div class="bar-chart-row">
+                            <div class="bar-chart-label">${p.ProductName.length > 12 ? p.ProductName.substring(0,12)+'…' : p.ProductName}</div>
+                            <div class="bar-chart-track">
+                                <div class="bar-chart-fill" style="width:${Math.round((p.TotalRevenue/maxRev)*100)}%">
+                                    <span class="bar-chart-val">${p.TotalRevenue} ₽</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Top 5 list
+                    document.getElementById('top5List').innerHTML = tops.slice(0,5).map((p, i) => {
+                        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other';
+                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i+1;
+                        return `<div class="top5-item">
+                            <div class="top5-rank ${rankClass}">${medal}</div>
+                            <div class="top5-name">${p.ProductName}</div>
+                            <div class="top5-qty">${p.TotalSold} шт.</div>
+                            <div class="top5-rev">${p.TotalRevenue} ₽</div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    document.getElementById('revenueBarChart').innerHTML = '<div style="text-align:center;padding:30px;color:#94A3B8;">Нет данных о продажах</div>';
+                    document.getElementById('top5List').innerHTML = '<div style="text-align:center;padding:30px;color:#94A3B8;">Нет продаж за период</div>';
+                }
+
+                // Low stock
+                const low = data.lowStockWarnings || [];
+                if (low.length === 0) {
+                    document.getElementById('lowStockAlerts').innerHTML = '<div style="color:#10B981;font-weight:700;padding:10px;">✅ Все ингредиенты на складе в достаточном количестве!</div>';
+                } else {
+                    document.getElementById('lowStockAlerts').innerHTML = low.map(l => {
+                        const cls = l.CurrentStock <= 0 ? 'danger' : 'warning';
+                        return `<div class="alert-card ${cls}">
+                            <div>
+                                <strong>${l.IngredientName}</strong><br>
+                                <span style="font-size:0.82rem;">Остаток: ${l.CurrentStock} ${l.Unit} (Минимум: ${l.MinStock} ${l.Unit})</span>
+                            </div>
+                            <span class="stock-badge-low">${l.CurrentStock <= 0 ? '🚨 ЗАКОНЧИЛСЯ' : '⚠️ ТРЕБУЕТСЯ ЗАКАЗ'}</span>
+                        </div>`;
+                    }).join('');
+                }
+            } catch (e) { console.error('Analytics error:', e); }
+        }
+
+        // ── MENU ──
+        async function loadMenu() {
+            try {
+                const prods = await fetch('/api/products').then(r => r.json());
+                document.getElementById('menuTableBody').innerHTML = prods.map(p => `
+                    <tr>
+                        <td><img src="${p.ImageUrl || '/img/pizza_default.svg'}" style="width:46px;height:46px;object-fit:contain;border-radius:8px;background:#FFF7ED;" onerror="this.onerror=null;this.src='/img/pizza_default.svg';"></td>
+                        <td><strong>${p.Name}</strong></td>
+                        <td><span style="font-size:0.8rem;color:#64748B;">${p.CategoryName || 'Пиццы'}</span></td>
+                        <td><strong style="color:#FF6900;">${p.BasePrice} ₽</strong></td>
+                        <td>${p.Badge ? `<span style="display:inline-block;background:#FF6900;color:white;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:50px;">${p.Badge}</span>` : '—'}</td>
+                        <td>
+                            <button class="btn-table ${p.IsAvailable ? 'btn-toggle-on' : 'btn-toggle-off'}" onclick="toggleProductAvail(${p.Id}, ${p.IsAvailable ? 0 : 1})">
+                                ${p.IsAvailable ? '● В наличии' : '○ Стоп-лист'}
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn-table btn-action-del" onclick="deleteProduct(${p.Id})">🗑 Удалить</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { }
+        }
+
+        async function toggleProductAvail(id, isAvailable) {
+            await fetch('/api/products/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, isAvailable })
+            });
+            await loadMenu();
+        }
+
+        async function deleteProduct(id) {
+            if (confirm('Удалить эту позицию из меню?')) {
+                await fetch('/api/products/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                await loadMenu();
+            }
+        }
+
+        function openAddProductModal() {
+            ['prodEditId','prodEditName','prodEditDesc','prodEditPrice','prodEditBadge','prodEditImg'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.getElementById('productModal').classList.add('open');
+        }
+
+        async function saveProductSubmit() {
+            const name = document.getElementById('prodEditName').value.trim();
+            const price = parseFloat(document.getElementById('prodEditPrice').value);
+            if (!name || isNaN(price)) { alert('Укажите название и цену'); return; }
+            await fetch('/api/products/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: document.getElementById('prodEditId').value || null,
+                    name,
+                    description: document.getElementById('prodEditDesc').value.trim(),
+                    categoryId: parseInt(document.getElementById('prodEditCat').value),
+                    basePrice: price,
+                    badge: document.getElementById('prodEditBadge').value.trim(),
+                    isPizza: document.getElementById('prodEditIsPizza').value === '1',
+                    imageUrl: document.getElementById('prodEditImg').value.trim()
+                })
+            });
+            closeModal('productModal');
+            await loadMenu();
+        }
+
+        // ── INVENTORY ──
+        async function loadInventory() {
+            try {
+                const items = await fetch('/api/inventory').then(r => r.json());
+                document.getElementById('inventoryTableBody').innerHTML = items.map(it => {
+                    const pct = Math.min(100, Math.round((it.CurrentStock / Math.max(it.MinStock * 3, 1)) * 100));
+                    const level = pct < 30 ? 'critical' : pct < 60 ? 'low' : 'ok';
+                    return `<tr>
+                        <td><strong>${it.IngredientName}</strong></td>
+                        <td style="min-width:160px;">
+                            <div class="stock-bar-wrap">
+                                <div class="stock-bar-track">
+                                    <div class="stock-bar-fill ${level}" style="width:${pct}%;"></div>
+                                </div>
+                                <span class="stock-pct ${level}">${pct}%</span>
+                            </div>
+                        </td>
+                        <td><strong>${it.CurrentStock} ${it.Unit}</strong></td>
+                        <td style="color:#64748B;">${it.MinStock} ${it.Unit}</td>
+                        <td>${it.CostPerUnit} ₽ / ${it.Unit}</td>
+                        <td>${it.CurrentStock <= it.MinStock ?
+                            '<span class="stock-badge-low">● Критический запас</span>' :
+                            '<span class="stock-badge-ok">● В норме</span>'}</td>
+                        <td>
+                            <button class="btn-table btn-toggle-on" onclick="restockItem(${it.Id}, 20)">+20</button>
+                            <button class="btn-table btn-toggle-on" onclick="restockItem(${it.Id}, 50)" style="margin-left:4px;">+50</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (e) { }
+        }
+
+        async function restockItem(ingredientId, amount) {
+            await fetch('/api/inventory/restock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ingredientId, amount })
+            });
+            await loadInventory();
+            await loadAnalytics();
+        }
+
+        // ── ORDERS ──
+        function filterOrders(btn, status) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadAllOrders(status);
+        }
+
+        const statusMap = {
+            'Created':   { label: '🆕 Принят',      cls: 'status-created' },
+            'Cooking':   { label: '👨‍🍳 Готовится',   cls: 'status-cooking' },
+            'Oven':      { label: '🔥 В печи',       cls: 'status-oven' },
+            'Ready':     { label: '✅ Готов',         cls: 'status-ready' },
+            'OnTheWay':  { label: '🛵 В пути',       cls: 'status-ontheway' },
+            'Delivered': { label: '🎉 Доставлен',    cls: 'status-delivered' },
+            'Cancelled': { label: '❌ Отменён',      cls: 'status-cancelled' },
+        };
+
+        async function loadAllOrders(statusFilter = '') {
+            try {
+                const url = statusFilter ? `/api/orders?status=${statusFilter}` : '/api/orders';
+                const orders = await fetch(url).then(r => r.json());
+                document.getElementById('ordersTableBody').innerHTML = orders.map(o => {
+                    const s = statusMap[o.Status] || { label: o.Status, cls: 'status-created' };
+                    return `<tr>
+                        <td><strong style="color:#FF6900;">${o.OrderNumber}</strong></td>
+                        <td>${o.OrderType === 'Delivery' ? '🛵 Доставка' : o.OrderType === 'DineIn' ? '🍽️ В зале' : '🛍️ Самовывоз'}</td>
+                        <td>${o.CustomerName}</td>
+                        <td style="font-size:0.82rem;color:#64748B;">${o.DeliveryAddress || o.CustomerPhone}</td>
+                        <td><strong>${o.TotalAmount} ₽</strong></td>
+                        <td style="font-size:0.82rem;">${o.PaymentMethod}</td>
+                        <td><span class="status-badge ${s.cls}">${s.label}</span></td>
+                        <td style="font-size:0.78rem;color:#94A3B8;">${o.CreatedAt}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="8" style="text-align:center;padding:30px;color:#94A3B8;">Заказы не найдены</td></tr>';
+            } catch (e) { }
+        }
+
+        // ── SHIFTS ──
+        async function loadShifts() {
+            try {
+                const shifts = await fetch('/api/shifts').then(r => r.json());
+                document.getElementById('shiftsTableBody').innerHTML = shifts.map(s => {
+                    const totalRev = (s.CashSales || 0) + (s.CardSales || 0) + (s.SBPSales || 0);
+                    const isOpen = s.Status === 'Open';
+                    return `<tr>
+                        <td><strong style="color:#F59E0B;">#${s.Id}</strong></td>
+                        <td><strong>${s.CashierName}</strong></td>
+                        <td style="font-size:0.82rem;">${s.OpenedAt}</td>
+                        <td style="font-size:0.82rem;">${s.ClosedAt || '<span class="shift-open-pill">В процессе</span>'}</td>
+                        <td><strong>${s.TotalOrders || 0}</strong></td>
+                        <td style="color:#10B981;font-weight:700;">${s.CashSales || 0} ₽</td>
+                        <td style="color:#3B82F6;font-weight:700;">${(s.CardSales || 0) + (s.SBPSales || 0)} ₽</td>
+                        <td style="font-size:1.1rem;font-weight:900;">${totalRev} ₽</td>
+                        <td>${isOpen ? '<span class="shift-open-pill">● Открыта</span>' : '<span style="color:#94A3B8;font-size:0.82rem;font-weight:700;">Закрыта</span>'}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="9" style="text-align:center;padding:30px;color:#94A3B8;">Смены не найдены</td></tr>';
+            } catch (e) { console.error(e); }
+        }
+
+        // ── REVIEWS ──
+        async function loadReviews() {
+            try {
+                const reviews = await fetch('/api/reviews').then(r => r.json());
+                document.getElementById('reviewsTableBody').innerHTML = reviews.map(r => {
+                    const stars = '⭐'.repeat(r.Rating || 5);
+                    const starEmpty = '☆'.repeat(5 - (r.Rating || 5));
+                    return `<tr>
+                        <td style="color:#94A3B8;font-size:0.8rem;">#${r.Id}</td>
+                        <td><strong style="color:#FF6900;">${r.OrderNumber || '—'}</strong></td>
+                        <td><strong>${r.CustomerName}</strong></td>
+                        <td><span style="font-size:1.1rem;letter-spacing:1px;">${stars}${starEmpty}</span> <span style="font-size:0.78rem;color:#64748B;">${r.Rating}/5</span></td>
+                        <td style="max-width:320px;font-size:0.85rem;">${r.Comment || '<span style="color:#94A3B8;">Без текста</span>'}</td>
+                        <td style="font-size:0.78rem;color:#94A3B8;">${r.CreatedAt}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="6" style="text-align:center;padding:30px;color:#94A3B8;">Отзывы пока не оставлены</td></tr>';
+            } catch (e) { console.error(e); }
+        }
+
+        // ── LOGS ──
+        async function loadLogs() {
+            try {
+                const logs = await fetch('/api/logs').then(r => r.json());
+                document.getElementById('logsTableBody').innerHTML = logs.map(l => `
+                    <tr>
+                        <td style="color:#94A3B8;font-size:0.78rem;">#${l.Id}</td>
+                        <td><strong>${l.UserName || 'Система'}</strong></td>
+                        <td><span style="display:inline-block;background:#EFF6FF;color:#1D4ED8;font-size:0.72rem;font-weight:800;padding:3px 9px;border-radius:50px;">${l.Action}</span></td>
+                        <td style="font-size:0.82rem;">${l.Details}</td>
+                        <td style="font-family:monospace;font-size:0.8rem;color:#64748B;">${l.IpAddress}</td>
+                        <td style="font-size:0.78rem;color:#94A3B8;">${l.Timestamp}</td>
+                    </tr>
+                `).join('');
+            } catch (e) { }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+    </script>
+</body>
+</html>

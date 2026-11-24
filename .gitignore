@@ -1,0 +1,13 @@
+# SQLite temporary files
+*.db-wal
+*.db-shm
+
+# Build and temp
+*.tmp
+*.log
+[Bb]in/
+[Oo]bj/
+
+# OS files
+.DS_Store
+Thumbs.db

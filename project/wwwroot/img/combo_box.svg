@@ -1,0 +1,17 @@
+﻿<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='box' x1='0%' y1='0%' x2='100%' y2='100%'>
+      <stop offset='0%' stop-color='#FF7043'/><stop offset='100%' stop-color='#D84315'/>
+    </linearGradient>
+    <filter id='dropBox'><feDropShadow dx='0' dy='8' stdDeviation='10' flood-color='#000' flood-opacity='0.25'/></filter>
+  </defs>
+  <!-- Pizza Box Base -->
+  <polygon points='80,240 200,290 320,240 200,200' fill='#BF360C' filter='url(#dropBox)'/>
+  <polygon points='80,225 200,275 320,225 200,185' fill='url(#box)' filter='url(#dropBox)'/>
+  <!-- Open lid or label -->
+  <ellipse cx='200' cy='230' rx='35' ry='15' fill='#FFFFFF'/>
+  <text x='200' y='235' font-family='sans-serif' font-weight='900' font-size='14' text-anchor='middle' fill='#D84315'>ELCHO'S</text>
+  <!-- Drink bottle beside -->
+  <rect x='280' y='140' width='35' height='90' rx='10' fill='#C62828' filter='url(#dropBox)'/>
+  <rect x='290' y='125' width='15' height='15' fill='#FFFFFF'/>
+</svg>

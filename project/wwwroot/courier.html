@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Elcho's Pizza Delivery — Модуль курьерской доставки</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛵</text></svg>">
+    <script src="/js/rbac.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #060C1A;
+            color: #F8FAFC;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        .courier-phone-frame {
+            width: 100%;
+            max-width: 480px;
+            background: #0F172A;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(0,0,0,0.6);
+            border-left: 1px solid #1E293B;
+            border-right: 1px solid #1E293B;
+        }
+
+        /* ───── HEADER ───── */
+        .courier-header {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            padding: 14px 18px 12px;
+            border-bottom: 1px solid #334155;
+        }
+        .courier-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .courier-rider-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .courier-avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #FF6900, #C85000);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+        }
+
+        /* Shift stats bar */
+        .courier-shift-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: #334155;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .courier-stat-cell {
+            background: #1E293B;
+            padding: 10px 8px;
+            text-align: center;
+        }
+        .courier-stat-cell .stat-val {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #FBBF24;
+        }
+        .courier-stat-cell .stat-lbl {
+            font-size: 0.6rem;
+            color: #64748B;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 2px;
+        }
+        .courier-stat-cell.green .stat-val { color: #10B981; }
+
+        /* ───── ORDERS SECTION ───── */
+        .courier-section-head {
+            padding: 12px 16px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .courier-orders-container {
+            flex-grow: 1;
+            padding: 0 14px 100px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* ───── ORDER CARDS ───── */
+        .courier-order-card {
+            background: #1E293B;
+            border-radius: 16px;
+            border: 2px solid #334155;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            transition: border-color 0.3s;
+        }
+        /* Urgency borders */
+        .courier-order-card.urgency-new     { border-color: #10B981; }
+        .courier-order-card.urgency-delayed { border-color: #F59E0B; }
+        .courier-order-card.urgency-late    { border-color: #EF4444; animation: pulseBorder 1.2s infinite; }
+        @keyframes pulseBorder {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+            50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+        }
+
+        .courier-ord-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        .courier-addr-box {
+            background: #0F172A;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.93rem;
+            line-height: 1.5;
+            border-left: 4px solid #FF6900;
+        }
+        .courier-addr-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .courier-btn-call {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #3B82F6;
+            color: white;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex: 1;
+            min-height: 44px;
+        }
+        .courier-btn-map {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #0F172A;
+            color: #FBBF24;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: 1px solid #374151;
+            min-height: 44px;
+        }
+        .courier-btn-map:hover { background: #1E293B; }
+
+        .courier-eta-box {
+            background: rgba(16,185,129,0.08);
+            border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #10B981;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .courier-btn-complete {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            min-height: 54px;
+        }
+        .courier-btn-complete:hover { background: #059669; transform: translateY(-1px); }
+        .courier-btn-enroute {
+            background: #FF6900;
+        }
+        .courier-btn-enroute:hover { background: #C85000; }
+
+        /* ───── FLOATING NAV MODE BUTTON ───── */
+        .courier-fab-nav {
+            position: fixed;
+            bottom: 72px;
+            right: calc(50% - 240px + 16px);
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 9999px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(59,130,246,0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+        .courier-fab-nav:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(59,130,246,0.6); }
+
+        /* ───── BOTTOM NAV ───── */
+        .courier-nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background: #0A1120;
+            border-top: 1px solid #1E293B;
+            display: flex;
+            padding: 6px 0 10px;
+            z-index: 200;
+        }
+        .courier-nav-item {
+            flex: 1;
+            text-align: center;
+            color: #64748B;
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            padding: 4px 0;
+            transition: color 0.2s;
+        }
+        .courier-nav-item .nav-icon { font-size: 1.3rem; }
+        .courier-nav-item.active { color: #FF6900; }
+        .courier-nav-item:hover  { color: #F8FAFC; }
+
+        /* NAV MODE map layout */
+        body.nav-mode .courier-orders-container { display: none; }
+        body.nav-mode .courier-map-panel { display: flex; }
+        .courier-map-panel {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 20px;
+            color: #64748B;
+            text-align: center;
+            gap: 16px;
+        }
+        .courier-map-panel .map-icon { font-size: 5rem; }
+    </style>
+</head>
+<body>
+
+    <div class="courier-phone-frame">
+        <!-- ШАПКА -->
+        <header class="courier-header">
+            <div class="courier-header-top">
+                <div class="courier-rider-info">
+                    <div class="courier-avatar">🛵</div>
+                    <div>
+                        <strong style="font-size:1rem;">Elcho's Courier</strong>
+                        <div style="font-size:0.72rem; color:#94A3B8;">Алексей Быстров | #CR-04</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="background:rgba(16,185,129,0.15); color:#10B981; border-radius:9999px; padding:4px 10px; font-size:0.72rem; font-weight:700;">● На смене</span>
+                    <a href="/" class="defense-pill" style="font-size:0.75rem;">🌐</a>
+                </div>
+            </div>
+            <!-- Shift stats -->
+            <div class="courier-shift-stats">
+                <div class="courier-stat-cell">
+                    <div class="stat-val" id="shiftDeliveries">3</div>
+                    <div class="stat-lbl">Доставок</div>
+                </div>
+                <div class="courier-stat-cell green">
+                    <div class="stat-val" id="shiftEarned">680 ₽</div>
+                    <div class="stat-lbl">Заработано</div>
+                </div>
+                <div class="courier-stat-cell">
+                    <div class="stat-val" id="shiftZone">Центр</div>
+                    <div class="stat-lbl">Зона</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="courier-section-head">
+            <h3 style="font-size:1.1rem; font-weight:800; margin:0;">Доставки в очереди</h3>
+            <span class="pos-status-badge" id="courierOrdersCount">0 заказов</span>
+        </div>
+
+        <!-- СПИСОК ЗАКАЗОВ -->
+        <div class="courier-orders-container" id="courierOrdersList">
+            <div style="text-align:center; padding:40px; color:#64748B;">
+                Загрузка доставок...
+            </div>
+        </div>
+
+        <!-- MAP MODE PANEL -->
+        <div class="courier-map-panel" id="courierMapPanel">
+            <div class="map-icon">🗺️</div>
+            <div style="font-size:1.2rem; font-weight:800;">Режим навигации</div>
+            <div style="font-size:0.9rem; line-height:1.5; max-width:280px;">
+                Встроенная GPS-навигация будет доступна в нативном мобильном приложении.<br><br>
+                Нажмите кнопку 📍 на карточке заказа, чтобы открыть адрес в Google Maps.
+            </div>
+            <button onclick="toggleNavMode()" style="background:#3B82F6; color:white; border:none; padding:14px 28px; border-radius:12px; font-size:1rem; font-weight:800; cursor:pointer;">
+                ← Вернуться к заказам
+            </button>
+        </div>
+
+        <!-- FLOATING NAV MODE BUTTON -->
+        <button class="courier-fab-nav" onclick="toggleNavMode()" id="navModeBtn">
+            🗺️ NAV MODE
+        </button>
+
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+        <nav class="courier-nav-bar">
+            <div class="courier-nav-item active" onclick="switchTab('home')">
+                <span class="nav-icon">🏠</span>
+                <span>Главная</span>
+            </div>
+            <div class="courier-nav-item" onclick="switchTab('orders')">
+                <span class="nav-icon">📦</span>
+                <span>Заказы</span>
+            </div>
+            <div class="courier-nav-item" onclick="switchTab('stats')">
+                <span class="nav-icon">📊</span>
+                <span>Статистика</span>
+            </div>
+            <div class="courier-nav-item" onclick="switchTab('profile')">
+                <span class="nav-icon">👤</span>
+                <span>Профиль</span>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        ElchosRBAC.enforce(['Courier', 'Admin'], 'Модуль курьерской доставки');
+
+        let navModeActive = false;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadCourierOrders();
+            initEventSource();
+        });
+
+        function initEventSource() {
+            try {
+                const evt = new EventSource('/api/events');
+                evt.onmessage = (e) => {
+                    try {
+                        const msg = JSON.parse(e.data);
+                        if (msg.type === 'order_created' || msg.type === 'order_status_updated') {
+                            loadCourierOrders();
+                        }
+                    } catch (e) { }
+                };
+            } catch (e) { }
+        }
+
+        async function loadCourierOrders() {
+            try {
+                const orders = await fetch('/api/orders/courier').then(r => r.json());
+                renderCourierOrders(orders);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function getUrgencyClass(order) {
+            const created = new Date(order.CreatedAt);
+            const ageMin = (Date.now() - created.getTime()) / 60000;
+            if (ageMin > 45) return 'urgency-late';
+            if (ageMin > 25) return 'urgency-delayed';
+            return 'urgency-new';
+        }
+
+        function getEta(order) {
+            const base = 25; // average delivery minutes
+            const created = new Date(order.CreatedAt);
+            const ageMin = Math.round((Date.now() - created.getTime()) / 60000);
+            const remaining = Math.max(0, base - ageMin);
+            if (remaining === 0) return '⚡ Уже должны доставить!';
+            return `~${remaining} мин до доставки`;
+        }
+
+        function buildMapsUrl(address) {
+            if (!address) return '#';
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+        }
+
+        function renderCourierOrders(orders) {
+            const container = document.getElementById('courierOrdersList');
+            document.getElementById('courierOrdersCount').textContent = `${orders.length} заказов`;
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:50px 20px; color:#64748B;">
+                        <div style="font-size:3rem; margin-bottom:10px;">🛵</div>
+                        <h3>Все доставки выполнены!</h3>
+                        <p style="font-size:0.85rem; margin-top:6px;">Ожидайте, пока кухня соберет новые заказы</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = orders.map(ord => {
+                const isPaid = ord.PaymentStatus === 'Paid';
+                const paymentLabel = isPaid ? '✅ Оплачено онлайн' : `💵 Принять наличными: ${ord.TotalAmount} ₽`;
+                const isEnRoute = ord.Status === 'OnTheWay';
+                const urgency = getUrgencyClass(ord);
+                const eta = getEta(ord);
+                const mapsUrl = buildMapsUrl(ord.DeliveryAddress);
+
+                return `
+                    <div class="courier-order-card ${urgency}">
+                        <div class="courier-ord-head">
+                            <div>
+                                <span style="font-size:1.25rem; font-weight:900; color:#FBBF24;">${ord.OrderNumber}</span>
+                                <span style="font-size:0.78rem; color:#94A3B8; margin-left:6px;">${ord.CustomerName}</span>
+                            </div>
+                            <span class="badge-pill" style="position:static; background:${isEnRoute ? '#FF6900' : '#10B981'};">
+                                ${isEnRoute ? 'В ПУТИ' : 'ГОТОВ К ВЫЕЗДУ'}
+                            </span>
+                        </div>
+
+                        <!-- Estimated arrival -->
+                        <div class="courier-eta-box">
+                            🕐 ${eta}
+                        </div>
+
+                        <div class="courier-addr-box">
+                            <strong>📍 Адрес доставки:</strong><br>
+                            ${ord.DeliveryAddress || 'Адрес не указан'}
+                            ${ord.Comment ? `<div style="font-size:0.8rem; color:#FBBF24; margin-top:4px;">💬 ${ord.Comment}</div>` : ''}
+                            <div class="courier-addr-actions">
+                                <a href="tel:${ord.CustomerPhone}" class="courier-btn-call">📞 Позвонить</a>
+                                <a href="${mapsUrl}" target="_blank" class="courier-btn-map">📍 Карта</a>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.88rem; font-weight:700; color:${isPaid ? '#10B981' : '#F59E0B'};">
+                                ${paymentLabel}
+                            </span>
+                        </div>
+
+                        <div style="border-top:1px solid #334155; padding-top:8px; font-size:0.8rem; color:#94A3B8;">
+                            Состав: ${(ord.items || []).map(it => `${it.ProductName} (x${it.Quantity})`).join(', ')}
+                        </div>
+
+                        ${!isEnRoute ? `
+                            <button class="courier-btn-complete courier-btn-enroute" onclick="updateCourierStatus(${ord.Id}, 'OnTheWay')">
+                                🛵 Взять заказ и выехать
+                            </button>
+                        ` : `
+                            <button class="courier-btn-complete" onclick="updateCourierStatus(${ord.Id}, 'Delivered')">
+                                ✅ Заказ вручен клиенту (Доставлен)
+                            </button>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function updateCourierStatus(orderId, newStatus) {
+            try {
+                await fetch(`/api/orders/${orderId}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                await loadCourierOrders();
+            } catch (e) {
+                alert('Ошибка обновления статуса');
+            }
+        }
+
+        function toggleNavMode() {
+            navModeActive = !navModeActive;
+            document.body.classList.toggle('nav-mode', navModeActive);
+            const btn = document.getElementById('navModeBtn');
+            btn.textContent = navModeActive ? '📦 Заказы' : '🗺️ NAV MODE';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.courier-nav-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            if (tab === 'orders' || tab === 'home') {
+                if (navModeActive) toggleNavMode();
+            }
+            if (tab === 'stats') {
+                alert(`📊 Статистика смены:\nДоставок: ${document.getElementById('shiftDeliveries').textContent}\nЗаработано: ${document.getElementById('shiftEarned').textContent}`);
+            }
+            if (tab === 'profile') {
+                alert('👤 Алексей Быстров\nID: #CR-04 | Зона: Центр\nРейтинг: ⭐⭐⭐⭐⭐');
+            }
+        }
+    </script>
+</body>
+</html>

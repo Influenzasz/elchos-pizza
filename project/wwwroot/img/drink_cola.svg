@@ -1,0 +1,15 @@
+﻿<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='cola' x1='0%' y1='0%' x2='100%' y2='0%'>
+      <stop offset='0%' stop-color='#880E4F'/><stop offset='30%' stop-color='#B71C1C'/><stop offset='70%' stop-color='#C62828'/><stop offset='100%' stop-color='#880E4F'/>
+    </linearGradient>
+    <filter id='dropD'><feDropShadow dx='0' dy='6' stdDeviation='8' flood-color='#000' flood-opacity='0.2'/></filter>
+  </defs>
+  <!-- Bottle body -->
+  <path d='M175,80 L225,80 L225,120 Q250,150 250,200 L250,300 Q250,320 225,320 L175,320 Q150,320 150,300 L150,200 Q150,150 175,120 Z' 
+        fill='url(#cola)' filter='url(#dropD)'/>
+  <!-- Cap -->
+  <rect x='180' y='60' width='40' height='20' rx='4' fill='#D32F2F'/>
+  <!-- White ribbon / label wave -->
+  <path d='M150,220 Q200,190 250,220 L250,250 Q200,220 150,250 Z' fill='#FFFFFF'/>
+</svg>

@@ -1,0 +1,23 @@
+﻿<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <radialGradient id='crust4' cx='50%' cy='50%' r='50%'>
+      <stop offset='78%' stop-color='#E67E22'/><stop offset='95%' stop-color='#D35400'/><stop offset='100%' stop-color='#873600'/>
+    </radialGradient>
+    <radialGradient id='cheese4' cx='50%' cy='50%' r='50%'>
+      <stop offset='0%' stop-color='#FFFFFF'/><stop offset='45%' stop-color='#FFF9C4'/><stop offset='80%' stop-color='#FDD835'/><stop offset='100%' stop-color='#F57F17'/>
+    </radialGradient>
+    <filter id='drop4'><feDropShadow dx='0' dy='8' stdDeviation='10' flood-color='#000' flood-opacity='0.25'/></filter>
+  </defs>
+  <circle cx='200' cy='200' r='185' fill='url(#crust4)' filter='url(#drop4)'/>
+  <circle cx='200' cy='200' r='160' fill='url(#cheese4)'/>
+  <!-- Blue Cheese Spots -->
+  <g fill='#78909C'>
+    <circle cx='150' cy='150' r='8'/><circle cx='160' cy='158' r='5'/><circle cx='235' cy='140' r='7'/><circle cx='245' cy='146' r='6'/>
+    <circle cx='180' cy='240' r='9'/><circle cx='240' cy='230' r='7'/><circle cx='200' cy='190' r='8'/><circle cx='130' cy='210' r='7'/>
+  </g>
+  <!-- Cheddar melted blobs -->
+  <g fill='#FF8F00' opacity='0.7'>
+    <ellipse cx='180' cy='140' rx='14' ry='10'/><ellipse cx='225' cy='185' rx='16' ry='11'/>
+    <ellipse cx='160' cy='200' rx='15' ry='9'/><ellipse cx='210' cy='240' rx='14' ry='10'/>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+.git
+.agents
+graphify-out
+Диплом_Пиццерия
+*.docx
+*.log
+*.tmp
+*.bat
+*.ps1

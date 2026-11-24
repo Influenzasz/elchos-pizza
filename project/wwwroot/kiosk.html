@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Киоск Самообслуживания — Elcho's Pizza</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📱</text></svg>">
+    <style>
+        :root {
+            --kiosk-primary: #FF6900;
+            --kiosk-primary-hover: #E05D00;
+            --kiosk-primary-soft: rgba(255, 105, 0, 0.12);
+            --kiosk-accent: #10B981;
+            --kiosk-accent-hover: #059669;
+            --kiosk-dark: #0F172A;
+            --kiosk-card-bg: #FFFFFF;
+            --kiosk-border: #E2E8F0;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background: #F8FAFC;
+            color: #0F172A;
+            font-family: 'Nunito', 'Inter', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══ ATTRACT / WELCOME SCREEN ══ */
+        .kiosk-welcome-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, #3B0764 0%, #1E1B4B 35%, #0F172A 75%, #020617 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            cursor: pointer;
+            text-align: center;
+            padding: 40px 24px;
+            overflow: hidden;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        /* Glowing floating background orbs */
+        .welcome-float-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .float-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.45;
+            animation: orbFloat 10s ease-in-out infinite alternate;
+        }
+
+        .float-orb.orb-1 {
+            width: 480px;
+            height: 480px;
+            background: linear-gradient(135deg, #FF6900, #F43F5E);
+            top: -100px;
+            left: -80px;
+            animation-duration: 9s;
+        }
+
+        .float-orb.orb-2 {
+            width: 520px;
+            height: 520px;
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+            bottom: -120px;
+            right: -80px;
+            animation-duration: 12s;
+            animation-delay: -3s;
+        }
+
+        .float-orb.orb-3 {
+            width: 320px;
+            height: 320px;
+            background: linear-gradient(135deg, #F59E0B, #EA580C);
+            top: 45%;
+            left: 55%;
+            transform: translate(-50%, -50%);
+            animation-duration: 8s;
+            animation-delay: -5s;
+            opacity: 0.3;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -30px) scale(1.08); }
+            100% { transform: translate(-30px, 40px) scale(0.95); }
+        }
+
+        /* Floating decorative food figures */
+        .float-food {
+            position: absolute;
+            font-size: 3.5rem;
+            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.4));
+            pointer-events: none;
+            opacity: 0.25;
+            animation: foodDrift 14s ease-in-out infinite;
+        }
+        .float-food.f1 { top: 12%; left: 10%; animation-duration: 12s; animation-delay: 0s; font-size: 4.5rem; }
+        .float-food.f2 { top: 18%; right: 12%; animation-duration: 15s; animation-delay: -2s; font-size: 3.8rem; }
+        .float-food.f3 { bottom: 18%; left: 12%; animation-duration: 13s; animation-delay: -5s; font-size: 4rem; }
+        .float-food.f4 { bottom: 14%; right: 10%; animation-duration: 16s; animation-delay: -7s; font-size: 4.2rem; }
+        .float-food.f5 { top: 48%; left: 5%; animation-duration: 11s; animation-delay: -3s; font-size: 3.2rem; }
+        .float-food.f6 { top: 45%; right: 6%; animation-duration: 14s; animation-delay: -8s; font-size: 3.5rem; }
+
+        @keyframes foodDrift {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-25px) rotate(8deg); }
+            50% { transform: translateY(15px) rotate(-6deg); }
+            75% { transform: translateY(-15px) rotate(4deg); }
+        }
+
+        /* Hero presentation in attract screen */
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 800px;
+        }
+
+        .kiosk-welcome-logo-wrap {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .kiosk-welcome-logo-halo {
+            position: absolute;
+            inset: -20px;
+            background: radial-gradient(circle, rgba(255, 105, 0, 0.45) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulseHalo 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseHalo {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.25); opacity: 0.9; }
+        }
+
+        .kiosk-welcome-logo {
+            font-size: 7.5rem;
+            position: relative;
+            z-index: 1;
+            animation: pizzaFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 20px 35px rgba(0, 0, 0, 0.6));
+            line-height: 1;
+        }
+
+        @keyframes pizzaFloat {
+            0%, 100% { transform: translateY(0) rotate(-4deg); }
+            50% { transform: translateY(-18px) rotate(4deg); }
+        }
+
+        .kiosk-welcome-brand {
+            font-size: 1.15rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #FF8A3D;
+            margin-top: 10px;
+            background: rgba(255, 105, 0, 0.15);
+            padding: 6px 18px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 138, 61, 0.35);
+        }
+
+        .kiosk-welcome-title {
+            font-size: 3.8rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin: 16px 0 8px;
+            background: linear-gradient(135deg, #FFFFFF 30%, #FFE3C2 70%, #FF9E53 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            line-height: 1.1;
+        }
+
+        .kiosk-welcome-sub {
+            font-size: 1.45rem;
+            color: #E2E8F0;
+            font-weight: 600;
+            max-width: 600px;
+            line-height: 1.4;
+            margin-bottom: 24px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .kiosk-welcome-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 38px;
+        }
+
+        .kiosk-welcome-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(12px);
+            border-radius: 50px;
+            padding: 10px 22px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .kiosk-welcome-badge:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .kiosk-touch-hint {
+            background: linear-gradient(135deg, #FF6900, #F43F5E);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            padding: 20px 56px;
+            border-radius: 9999px;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: white;
+            box-shadow: 0 12px 36px rgba(255, 105, 0, 0.45);
+            animation: touchPulse 2s ease-in-out infinite;
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        @keyframes touchPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 105, 0, 0.6), 0 12px 36px rgba(255, 105, 0, 0.45);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(255, 105, 0, 0), 0 16px 44px rgba(255, 105, 0, 0.6);
+                transform: scale(1.03);
+            }
+        }
+
+        /* ══ HEADER ══ */
+        .kiosk-header {
+            background: #FFFFFF;
+            border-bottom: 2px solid var(--kiosk-border);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .kiosk-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .kiosk-brand-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #FF6900, #EA580C);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 6px 18px rgba(255, 105, 0, 0.35);
+        }
+
+        .kiosk-brand-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--kiosk-dark);
+            line-height: 1.2;
+        }
+
+        .kiosk-brand-sub {
+            font-size: 0.88rem;
+            color: #64748B;
+            font-weight: 600;
+        }
+
+        .kiosk-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .kiosk-pill-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .kiosk-pill-cancel {
+            background: #FEE2E2;
+            color: #DC2626;
+            border: 1.5px solid #FECACA;
+        }
+        .kiosk-pill-cancel:hover {
+            background: #FCA5A5;
+            color: #991B1B;
+            transform: translateY(-1px);
+        }
+
+        .kiosk-pill-exit {
+            background: #F1F5F9;
+            color: #475569;
+            border: 1.5px solid #E2E8F0;
+        }
+        .kiosk-pill-exit:hover {
+            background: #E2E8F0;
+            color: #0F172A;
+            transform: translateY(-1px);
+        }
+
+        /* ══ MAIN BODY (CATEGORIES + PRODUCTS) ══ */
+        .kiosk-body {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Category Nav */
+        .kiosk-cats-nav {
+            background: #FFFFFF;
+            border-right: 2px solid var(--kiosk-border);
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        .kiosk-cat-card {
+            background: #F8FAFC;
+            border: 2px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 14px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .kiosk-cat-icon {
+            font-size: 1.9rem;
+            line-height: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .kiosk-cat-name {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #334155;
+            line-height: 1.2;
+        }
+
+        .kiosk-cat-card:hover {
+            background: #FFF7ED;
+            border-color: #FDBA74;
+            transform: translateX(4px);
+        }
+        .kiosk-cat-card:hover .kiosk-cat-icon {
+            transform: scale(1.15);
+        }
+
+        .kiosk-cat-card.active {
+            background: linear-gradient(135deg, #FFF0E6 0%, #FFEDD5 100%);
+            border-color: #FF6900;
+            box-shadow: 0 4px 16px rgba(255, 105, 0, 0.2);
+            transform: translateX(6px);
+        }
+        .kiosk-cat-card.active .kiosk-cat-name {
+            color: #C2410C;
+            font-weight: 900;
+        }
+        .kiosk-cat-card.active .kiosk-cat-icon {
+            transform: scale(1.2);
+        }
+
+        /* Products Grid */
+        .kiosk-products-area {
+            padding: 24px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 20px;
+            align-content: start;
+        }
+
+        .kiosk-prod-card {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 18px;
+            border: 2px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            cursor: pointer;
+            transition: all 0.22s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kiosk-prod-card:hover {
+            border-color: #FF6900;
+            box-shadow: 0 10px 28px rgba(255, 105, 0, 0.16);
+            transform: translateY(-4px);
+        }
+
+        .kiosk-prod-card:active {
+            transform: scale(0.97);
+        }
+
+        .kiosk-prod-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: linear-gradient(135deg, #FF6900, #F43F5E);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 50px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(255, 105, 0, 0.35);
+            z-index: 2;
+        }
+
+        .kiosk-prod-img-wrap {
+            width: 100%;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .kiosk-prod-img {
+            max-width: 100%;
+            max-height: 140px;
+            object-fit: contain;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .kiosk-prod-card:hover .kiosk-prod-img {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .kiosk-prod-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .kiosk-prod-title {
+            font-size: 1.12rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            line-height: 1.25;
+            color: #0F172A;
+        }
+
+        .kiosk-prod-meta {
+            font-size: 0.85rem;
+            color: #64748B;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .kiosk-prod-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px dashed #E2E8F0;
+        }
+
+        .kiosk-prod-price {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #FF6900;
+            letter-spacing: -0.5px;
+        }
+
+        .kiosk-btn-add {
+            background: linear-gradient(135deg, #FFF0E6, #FFE2CF);
+            color: #C2410C;
+            border: 1.5px solid rgba(255, 105, 0, 0.25);
+            border-radius: 50px;
+            padding: 8px 18px;
+            font-size: 0.92rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .kiosk-prod-card:hover .kiosk-btn-add {
+            background: linear-gradient(135deg, #FF6900, #EA580C);
+            color: #FFFFFF;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(255, 105, 0, 0.35);
+        }
+
+        /* ══ BOTTOM BAR (CART & ORDER) ══ */
+        .kiosk-bottom-bar {
+            background: #FFFFFF;
+            border-top: 2px solid var(--kiosk-border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+            flex-shrink: 0;
+            gap: 24px;
+            z-index: 20;
+        }
+
+        .kiosk-order-summary {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .kiosk-cart-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kiosk-cart-count-label {
+            font-size: 0.88rem;
+            color: #64748B;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .kiosk-total-price {
+            font-size: 2.3rem;
+            font-weight: 900;
+            color: #0F172A;
+            line-height: 1.1;
+        }
+
+        .kiosk-type-wrap {
+            display: flex;
+            background: #F1F5F9;
+            padding: 4px;
+            border-radius: 9999px;
+            gap: 4px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .kiosk-type-btn {
+            padding: 10px 22px;
+            border-radius: 9999px;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #64748B;
+        }
+
+        .kiosk-type-btn.active {
+            background: #FFFFFF;
+            color: #C2410C;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .kiosk-btn-pay {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 18px 48px;
+            border-radius: 9999px;
+            font-size: 1.35rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 8px 28px rgba(16, 185, 129, 0.45);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .kiosk-btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 36px rgba(16, 185, 129, 0.55);
+        }
+
+        .kiosk-btn-pay:active {
+            transform: scale(0.98);
+        }
+
+        .kiosk-btn-pay:disabled {
+            background: #CBD5E1;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.7;
+        }
+
+        /* ══ TOAST NOTIFICATION ══ */
+        .kiosk-toast {
+            position: fixed;
+            bottom: 115px;
+            left: 50%;
+            transform: translateX(-50%) translateY(24px) scale(0.95);
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 9999px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            z-index: 2500;
+            opacity: 0;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .kiosk-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .kiosk-toast-icon {
+            font-size: 1.3rem;
+            line-height: 1;
+        }
+
+        /* ══ SUCCESS MODAL ══ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 4000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-window {
+            background: #FFFFFF;
+            border-radius: 28px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            max-width: 540px;
+            width: 100%;
+            text-align: center;
+            padding: 44px 36px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.open .modal-window {
+            transform: scale(1);
+        }
+
+        .kiosk-success-icon {
+            font-size: 5rem;
+            animation: bounceSuccess 1.6s ease-in-out infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes bounceSuccess {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-16px) scale(1.1); }
+        }
+
+        .kiosk-order-num-badge {
+            font-size: 4.2rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #FF6900, #F59E0B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 16px 0;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ══ ЗАСТАВКА КИОСКА (ATTRACT / WELCOME SCREEN) ══ -->
+    <div class="kiosk-welcome-screen" id="kioskWelcome" onclick="startKioskOrder()">
+        <!-- Плавающие светящиеся сферы -->
+        <div class="welcome-float-bg">
+            <div class="float-orb orb-1"></div>
+            <div class="float-orb orb-2"></div>
+            <div class="float-orb orb-3"></div>
+            
+            <!-- Парящие декоративные элементы еды -->
+            <div class="float-food f1">🍕</div>
+            <div class="float-food f2">🍔</div>
+            <div class="float-food f3">🥤</div>
+            <div class="float-food f4">🍟</div>
+            <div class="float-food f5">✨</div>
+            <div class="float-food f6">🔥</div>
+        </div>
+
+        <div class="welcome-content">
+            <div class="kiosk-welcome-logo-wrap">
+                <div class="kiosk-welcome-logo-halo"></div>
+                <div class="kiosk-welcome-logo">🍕</div>
+            </div>
+
+            <div class="kiosk-welcome-brand">ELCHO'S PIZZA</div>
+            <h1 class="kiosk-welcome-title">Добро пожаловать!</h1>
+            <div class="kiosk-welcome-sub">Горячая пицца из печи, сытные закуски и авторские напитки</div>
+
+            <div class="kiosk-welcome-badges">
+                <div class="kiosk-welcome-badge">🔥 Из настоящей печи</div>
+                <div class="kiosk-welcome-badge">⚡ Готовим за 7–10 минут</div>
+                <div class="kiosk-welcome-badge">🧀 100% Натуральная моцарелла</div>
+                <div class="kiosk-welcome-badge">💳 Оплата картой на месте</div>
+            </div>
+
+            <div class="kiosk-touch-hint">
+                <span>✨</span>
+                <span>Коснитесь экрана для заказа</span>
+                <span>➔</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ ШАПКА КИОСКА ══ -->
+    <header class="kiosk-header">
+        <div class="kiosk-brand">
+            <div class="kiosk-brand-icon">🍕</div>
+            <div>
+                <div class="kiosk-brand-title">Elcho's Pizza — Киоск Заказа</div>
+                <div class="kiosk-brand-sub">Выберите блюда на экране и заберите заказ по номеру на табло</div>
+            </div>
+        </div>
+        <div class="kiosk-header-actions">
+            <button class="kiosk-pill-btn kiosk-pill-cancel" onclick="resetKiosk()">
+                ✕ Отменить заказ
+            </button>
+            <a href="/" class="kiosk-pill-btn kiosk-pill-exit">
+                🌐 Выйти на сайт
+            </a>
+        </div>
+    </header>
+
+    <!-- ══ ТЕЛО КИОСКА ══ -->
+    <main class="kiosk-body">
+        <!-- Левое меню категорий -->
+        <nav class="kiosk-cats-nav" id="kioskCats"></nav>
+
+        <!-- Сетка карточек блюд -->
+        <section class="kiosk-products-area" id="kioskProducts"></section>
+    </main>
+
+    <!-- ══ НИЖНЯЯ ПАНЕЛЬ С КОРЗИНОЙ И ОПЛАТОЙ ══ -->
+    <footer class="kiosk-bottom-bar">
+        <div class="kiosk-order-summary">
+            <div class="kiosk-cart-stat">
+                <div class="kiosk-cart-count-label">ВЫБРАНО ПОЗИЦИЙ: <span id="kioskItemsCount" style="color:#0F172A; font-weight:900;">0</span></div>
+                <div class="kiosk-total-price" id="kioskTotalPrice">0 ₽</div>
+            </div>
+            <div class="kiosk-type-wrap">
+                <button class="kiosk-type-btn active" id="kioskTypeDine" onclick="setKioskType('DineIn')">🍽️ В пиццерии</button>
+                <button class="kiosk-type-btn" id="kioskTypeTake" onclick="setKioskType('Takeout')">🛍️ С собой</button>
+            </div>
+        </div>
+
+        <button class="kiosk-btn-pay" id="kioskPayBtn" onclick="submitKioskOrder()">
+            <span>ОПЛАТИТЬ ЗАКАЗ</span>
+            <span style="font-size:1.5rem;">➔</span>
+        </button>
+    </footer>
+
+    <!-- ══ ВСПЛЫВАЮЩИЙ ТОСТ ДОБАВЛЕНИЯ В КОРЗИНУ ══ -->
+    <div class="kiosk-toast" id="kioskToast">
+        <span class="kiosk-toast-icon">✅</span>
+        <span id="kioskToastText">Блюдо добавлено в заказ</span>
+    </div>
+
+    <!-- ══ ЭКРАН УСПЕХА И НОМЕРА ЗАКАЗА ══ -->
+    <div class="modal-overlay" id="kioskSuccessModal">
+        <div class="modal-window">
+            <div class="kiosk-success-icon">🎉</div>
+            <h2 style="font-size:2.2rem; font-weight:900; margin-bottom:8px; color:#0F172A;">Заказ оплачен!</h2>
+            <div style="font-size:1.15rem; color:#64748B; font-weight:700;">Ваш номер заказа:</div>
+            <div class="kiosk-order-num-badge" id="kioskSuccessNumber">#106</div>
+            <p style="font-size:1.15rem; color:#334155; line-height:1.5; margin:16px 0 24px;">
+                Повара уже приступили к приготовлению!<br>
+                Следите за готовностью вашего номера на <strong>табло в зале</strong>.
+            </p>
+            <button class="btn-checkout" onclick="finishKiosk()" style="width:100%; padding:18px; font-size:1.25rem; font-weight:900; border-radius:9999px; background:linear-gradient(135deg, #FF6900, #EA580C); color:white; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(255,105,0,0.35);">
+                Завершить (Спасибо!)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let kioskCategories = [];
+        let kioskProducts = [];
+        let kioskCart = [];
+        let kioskOrderType = 'DineIn';
+        let toastTimer = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const [cats, prods] = await Promise.all([
+                    fetch('/api/categories').then(r => r.json()),
+                    fetch('/api/products').then(r => r.json())
+                ]);
+                kioskCategories = cats || [];
+                kioskProducts = prods || [];
+
+                renderKioskCategories();
+                renderKioskProducts(kioskProducts);
+                updateKioskUI();
+            } catch (err) {
+                console.error('Ошибка загрузки данных киоска:', err);
+            }
+        });
+
+        function startKioskOrder() {
+            const welcome = document.getElementById('kioskWelcome');
+            welcome.style.opacity = '0';
+            welcome.style.pointerEvents = 'none';
+            setTimeout(() => {
+                welcome.style.display = 'none';
+            }, 300);
+        }
+
+        function resetKiosk() {
+            if (kioskCart.length === 0 || confirm('Отменить текущий заказ и вернуться на экран приветствия?')) {
+                kioskCart = [];
+                updateKioskUI();
+                const welcome = document.getElementById('kioskWelcome');
+                welcome.style.display = 'flex';
+                welcome.style.pointerEvents = 'auto';
+                setTimeout(() => {
+                    welcome.style.opacity = '1';
+                }, 10);
+            }
+        }
+
+        function renderKioskCategories() {
+            const nav = document.getElementById('kioskCats');
+            if (!nav) return;
+
+            let html = `
+                <div class="kiosk-cat-card active" onclick="filterKioskCat('all', this)">
+                    <span class="kiosk-cat-icon">🍕</span>
+                    <span class="kiosk-cat-name">Все меню</span>
+                </div>
+            `;
+
+            html += kioskCategories.map(c => `
+                <div class="kiosk-cat-card" onclick="filterKioskCat(${c.Id}, this)">
+                    <span class="kiosk-cat-icon">${c.Icon || '🍽️'}</span>
+                    <span class="kiosk-cat-name">${c.Name}</span>
+                </div>
+            `).join('');
+
+            nav.innerHTML = html;
+        }
+
+        function filterKioskCat(catId, el) {
+            document.querySelectorAll('.kiosk-cat-card').forEach(c => c.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            if (catId === 'all') {
+                renderKioskProducts(kioskProducts);
+            } else {
+                renderKioskProducts(kioskProducts.filter(p => p.CategoryId === catId));
+            }
+        }
+
+        function renderKioskProducts(products) {
+            const container = document.getElementById('kioskProducts');
+            if (!container) return;
+
+            if (!products || products.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #94A3B8;">
+                        <div style="font-size: 3.5rem; margin-bottom: 12px;">🔍</div>
+                        <div style="font-size: 1.3rem; font-weight: 800; color: #475569;">В этой категории пока пусто</div>
+                        <div style="font-size: 0.95rem;">Выберите другую категорию слева</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = products.map((p, index) => {
+                const badgeHtml = p.IsPopular || index < 3 
+                    ? `<span class="kiosk-prod-badge">🔥 Хит</span>` 
+                    : '';
+
+                return `
+                    <div class="kiosk-prod-card" onclick="addKioskItem(${p.Id})">
+                        ${badgeHtml}
+                        <div class="kiosk-prod-img-wrap">
+                            <img src="${p.ImageUrl || '/img/pizza_default.svg'}" class="kiosk-prod-img" alt="${p.Name}" onerror="this.onerror=null; this.src='/img/pizza_default.svg';">
+                        </div>
+                        <div class="kiosk-prod-info">
+                            <div class="kiosk-prod-title">${p.Name}</div>
+                            <div class="kiosk-prod-meta">${p.Calories ? p.Calories + ' ккал' : 'Свежая выпечка'}</div>
+                            <div class="kiosk-prod-footer">
+                                <div class="kiosk-prod-price">${p.BasePrice} ₽</div>
+                                <button class="kiosk-btn-add" onclick="event.stopPropagation(); addKioskItem(${p.Id})">
+                                    <span>+ В заказ</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showKioskToast(productName) {
+            const toast = document.getElementById('kioskToast');
+            const toastText = document.getElementById('kioskToastText');
+            if (!toast) return;
+
+            if (toastText) {
+                toastText.innerHTML = `<strong>${productName}</strong> добавлен в заказ`;
+            }
+
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function addKioskItem(productId) {
+            const prod = kioskProducts.find(p => p.Id === productId);
+            if (!prod) return;
+
+            const existing = kioskCart.find(it => it.productId === productId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                kioskCart.push({
+                    productId: prod.Id,
+                    productName: prod.Name,
+                    sizeName: prod.IsPizza ? 'Средняя 30 см' : null,
+                    doughName: prod.IsPizza ? 'Традиционное' : null,
+                    selectedToppings: [],
+                    unitPrice: prod.BasePrice,
+                    quantity: 1
+                });
+            }
+
+            updateKioskUI();
+            showKioskToast(prod.Name);
+        }
+
+        function updateKioskUI() {
+            const count = kioskCart.reduce((sum, it) => sum + it.quantity, 0);
+            const total = kioskCart.reduce((sum, it) => sum + (it.unitPrice * it.quantity), 0);
+
+            const countEl = document.getElementById('kioskItemsCount');
+            const totalEl = document.getElementById('kioskTotalPrice');
+            const payBtn = document.getElementById('kioskPayBtn');
+
+            if (countEl) countEl.textContent = count;
+            if (totalEl) totalEl.textContent = total.toLocaleString('ru-RU') + ' ₽';
+            if (payBtn) payBtn.disabled = count === 0;
+        }
+
+        function setKioskType(type) {
+            kioskOrderType = type;
+            document.getElementById('kioskTypeDine').classList.toggle('active', type === 'DineIn');
+            document.getElementById('kioskTypeTake').classList.toggle('active', type === 'Takeout');
+        }
+
+        async function submitKioskOrder() {
+            if (kioskCart.length === 0) {
+                alert('Выберите хотя бы одно блюдо перед оплатой');
+                return;
+            }
+
+            const payload = {
+                orderType: kioskOrderType,
+                customerName: 'Гость терминала',
+                paymentMethod: 'CardTerminal',
+                items: kioskCart
+            };
+
+            try {
+                const res = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(r => r.json());
+
+                if (res && res.success) {
+                    document.getElementById('kioskSuccessNumber').textContent = res.orderNumber || '#101';
+                    document.getElementById('kioskSuccessModal').classList.add('open');
+                } else {
+                    alert('Не удалось оформить заказ. Попробуйте еще раз.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Ошибка отправки заказа на сервер');
+            }
+        }
+
+        function finishKiosk() {
+            document.getElementById('kioskSuccessModal').classList.remove('open');
+            kioskCart = [];
+            updateKioskUI();
+            const welcome = document.getElementById('kioskWelcome');
+            welcome.style.display = 'flex';
+            welcome.style.pointerEvents = 'auto';
+            setTimeout(() => {
+                welcome.style.opacity = '1';
+            }, 10);
+        }
+    </script>
+</body>
+</html>

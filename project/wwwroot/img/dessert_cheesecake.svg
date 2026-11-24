@@ -1,0 +1,17 @@
+﻿<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='cheeseCake' x1='0%' y1='0%' x2='100%' y2='0%'>
+      <stop offset='0%' stop-color='#FFFDE7'/><stop offset='100%' stop-color='#FFF9C4'/>
+    </linearGradient>
+    <filter id='dropC'><feDropShadow dx='0' dy='6' stdDeviation='8' flood-color='#000' flood-opacity='0.2'/></filter>
+  </defs>
+  <!-- Crust base -->
+  <polygon points='90,260 310,260 290,280 110,280' fill='#A1887F' filter='url(#dropC)'/>
+  <!-- Cheesecake triangle -->
+  <polygon points='290,130 90,260 310,260' fill='url(#cheeseCake)' filter='url(#dropC)'/>
+  <!-- Strawberry topping layer -->
+  <path d='M290,130 L160,215 Q210,210 250,225 T310,210 L310,200 Z' fill='#E53935'/>
+  <!-- Strawberry on top -->
+  <circle cx='280' cy='120' r='18' fill='#C62828'/>
+  <path d='M280,105 L284,98 L288,105 Z' fill='#2E7D32'/>
+</svg>

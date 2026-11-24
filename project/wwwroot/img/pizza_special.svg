@@ -1,0 +1,33 @@
+﻿<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <radialGradient id='crust2' cx='50%' cy='50%' r='50%'>
+      <stop offset='78%' stop-color='#E67E22'/><stop offset='95%' stop-color='#D35400'/><stop offset='100%' stop-color='#873600'/>
+    </radialGradient>
+    <radialGradient id='cheese2' cx='50%' cy='50%' r='50%'>
+      <stop offset='0%' stop-color='#FFF9C4'/><stop offset='65%' stop-color='#FBC02D'/><stop offset='90%' stop-color='#E65100'/>
+    </radialGradient>
+    <radialGradient id='meat' cx='35%' cy='35%' r='65%'>
+      <stop offset='0%' stop-color='#8D6E63'/><stop offset='70%' stop-color='#5D4037'/><stop offset='100%' stop-color='#3E2723'/>
+    </radialGradient>
+    <filter id='drop2'><feDropShadow dx='0' dy='8' stdDeviation='10' flood-color='#000' flood-opacity='0.25'/></filter>
+  </defs>
+  <circle cx='200' cy='200' r='185' fill='url(#crust2)' filter='url(#drop2)'/>
+  <circle cx='200' cy='200' r='160' fill='url(#cheese2)'/>
+  <!-- Bacon Strips -->
+  <path d='M120 130 Q150 120 180 135 T240 130' stroke='#D32F2F' stroke-width='10' stroke-linecap='round' fill='none'/>
+  <path d='M140 250 Q170 260 200 245 T260 255' stroke='#D32F2F' stroke-width='10' stroke-linecap='round' fill='none'/>
+  <path d='M110 200 Q140 190 170 205' stroke='#D32F2F' stroke-width='9' stroke-linecap='round' fill='none'/>
+  <!-- Meatballs -->
+  <g fill='url(#meat)'>
+    <circle cx='200' cy='180' r='20'/><circle cx='150' cy='160' r='18'/><circle cx='245' cy='165' r='19'/>
+    <circle cx='180' cy='225' r='18'/><circle cx='235' cy='220' r='20'/><circle cx='215' cy='130' r='17'/>
+  </g>
+  <!-- Mushrooms -->
+  <g fill='#E0E0E0' stroke='#9E9E9E' stroke-width='1.5'>
+    <path d='M130 220 a15 15 0 0 1 30 0 z'/><rect x='142' y='220' width='6' height='8' fill='#BDBDBD'/>
+    <path d='M220 190 a15 15 0 0 1 30 0 z'/><rect x='232' y='190' width='6' height='8' fill='#BDBDBD'/>
+    <path d='M170 160 a13 13 0 0 1 26 0 z'/><rect x='180' y='160' width='5' height='7' fill='#BDBDBD'/>
+  </g>
+  <!-- Greens -->
+  <circle cx='200' cy='200' r='5' fill='#2E7D32'/><circle cx='160' cy='180' r='5' fill='#2E7D32'/><circle cx='230' cy='240' r='5' fill='#2E7D32'/>
+</svg>

@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS-Терминал Кассира — Elcho's Pizza</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖥️</text></svg>">
+    <script src="/js/rbac.js"></script>
+    <style>
+        body {
+            background: #0F172A;
+            color: #F8FAFC;
+            overflow: hidden;
+            height: 100vh;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        .pos-container {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            height: 100vh;
+        }
+        .pos-main {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #334155;
+            background: #1E293B;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* =================== HEADER =================== */
+        .pos-header {
+            background: #0A0F1A;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+            gap: 12px;
+        }
+        .pos-cashier-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .pos-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .pos-status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Clock & shift timer */
+        .pos-clock-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+        .pos-clock {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #FBBF24;
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+        .pos-shift-timer {
+            font-size: 0.75rem;
+            color: #94A3B8;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .pos-shift-timer strong {
+            display: block;
+            color: #60A5FA;
+            font-size: 1rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Shortcut keys display */
+        .pos-shortcuts {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .pos-shortcut-pill {
+            background: #1E293B;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            color: #94A3B8;
+            white-space: nowrap;
+        }
+        .pos-shortcut-pill kbd {
+            background: #334155;
+            color: #FBBF24;
+            border-radius: 3px;
+            padding: 1px 5px;
+            font-size: 0.65rem;
+            font-family: monospace;
+            font-weight: 700;
+        }
+
+        /* =================== CATEGORY BAR =================== */
+        .pos-category-bar {
+            background: #1E293B;
+            padding: 10px 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            border-bottom: 1px solid #334155;
+            scrollbar-width: none;
+        }
+        .pos-category-bar::-webkit-scrollbar { display: none; }
+        .pos-cat-btn {
+            background: #334155;
+            color: #CBD5E1;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .pos-cat-btn.active, .pos-cat-btn:hover {
+            background: #FF6900;
+            color: white;
+        }
+
+        /* =================== PRODUCT GRID =================== */
+        .pos-grid {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            align-content: start;
+        }
+        .pos-card {
+            background: #334155;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            border: 1px solid #475569;
+            user-select: none;
+            position: relative;
+        }
+        .pos-card:hover {
+            transform: translateY(-3px);
+            border-color: #FF6900;
+            box-shadow: 0 0 18px rgba(255, 105, 0, 0.45), 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .pos-card:active {
+            transform: scale(0.97);
+        }
+        .pos-card-img-wrap {
+            position: relative;
+            width: 100%;
+            height: 130px;
+            overflow: hidden;
+        }
+        .pos-card-img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.2s;
+        }
+        .pos-card:hover .pos-card-img {
+            transform: scale(1.05);
+        }
+        /* Gradient overlay with product name */
+        .pos-card-img-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+            padding: 8px 10px 6px;
+        }
+        .pos-card-img-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+        }
+        /* Availability badge */
+        .pos-avail-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.4);
+        }
+        .pos-avail-badge.in-stock { background: #10B981; box-shadow: 0 0 6px #10B981; }
+        .pos-avail-badge.stop-list { background: #EF4444; box-shadow: 0 0 6px #EF4444; }
+
+        .pos-card-body {
+            padding: 8px 12px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .pos-card-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #CBD5E1;
+            line-height: 1.2;
+            display: none; /* shown in overlay now */
+        }
+        .pos-card-price {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #FBBF24;
+        }
+        .pos-card-add-btn {
+            background: rgba(255,105,0,0.15);
+            border: 1px solid rgba(255,105,0,0.4);
+            color: #FF6900;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 1rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .pos-card:hover .pos-card-add-btn {
+            background: #FF6900;
+            color: white;
+        }
+
+        /* Hotkeys legend */
+        .pos-hotkeys-legend {
+            background: #0F172A;
+            border-top: 1px solid #334155;
+            padding: 8px 16px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .pos-hotkeys-legend span {
+            font-size: 0.72rem;
+            color: #64748B;
+        }
+        .pos-hotkeys-legend kbd {
+            background: #334155;
+            color: #FBBF24;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 0.68rem;
+            font-family: monospace;
+            font-weight: 700;
+        }
+
+        /* =================== BILL PANEL (RIGHT SIDEBAR) =================== */
+        .pos-sidebar {
+            background: #0F172A;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .pos-bill-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Customer name field */
+        .pos-customer-field {
+            padding: 8px 16px;
+            border-bottom: 1px solid #334155;
+        }
+        .pos-customer-field input {
+            width: 100%;
+            background: #1E293B;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            padding: 7px 12px;
+            font-size: 0.85rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .pos-customer-field input:focus {
+            border-color: #FF6900;
+        }
+        .pos-customer-field input::placeholder {
+            color: #475569;
+        }
+
+        .pos-type-toggle {
+            display: flex;
+            background: #1E293B;
+            border-radius: 8px;
+            padding: 3px;
+            gap: 2px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .pos-type-btn {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            background: transparent;
+            color: #94A3B8;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .pos-type-btn.active {
+            background: #FF6900;
+            color: white;
+        }
+        .pos-bill-items {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .pos-bill-item {
+            background: #1E293B;
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #334155;
+        }
+        .pos-item-info { flex-grow: 1; }
+        .pos-item-name { font-size: 0.9rem; font-weight: 700; }
+        .pos-item-meta { font-size: 0.75rem; color: #94A3B8; }
+        .pos-item-qty {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 10px;
+        }
+        .pos-qty-btn {
+            background: #334155;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .pos-item-price {
+            font-weight: 800;
+            color: #FBBF24;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* =================== BILL FOOTER =================== */
+        .pos-bill-footer {
+            padding: 14px 16px;
+            border-top: 1px solid #334155;
+            background: #080D18;
+        }
+
+        /* Discount row */
+        .pos-discount-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+        .pos-discount-row label {
+            font-size: 0.8rem;
+            color: #94A3B8;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .pos-discount-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .pos-discount-input-wrap input {
+            width: 56px;
+            background: #1E293B;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #FCD34D;
+            font-size: 0.9rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            text-align: center;
+            outline: none;
+        }
+        .pos-discount-input-wrap span {
+            color: #64748B;
+            font-size: 0.8rem;
+        }
+        .pos-discount-saved {
+            font-size: 0.8rem;
+            color: #10B981;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Payment method buttons */
+        .pos-payment-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .pos-pay-method-btn {
+            border: 2px solid #334155;
+            background: #1E293B;
+            color: #94A3B8;
+            border-radius: 10px;
+            padding: 10px 4px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            line-height: 1.4;
+        }
+        .pos-pay-method-btn .pay-icon { font-size: 1.3rem; display: block; }
+        .pos-pay-method-btn.active-card {
+            border-color: #3B82F6;
+            background: rgba(59,130,246,0.15);
+            color: #60A5FA;
+        }
+        .pos-pay-method-btn.active-sbp {
+            border-color: #A855F7;
+            background: rgba(168,85,247,0.15);
+            color: #C084FC;
+        }
+        .pos-pay-method-btn.active-cash {
+            border-color: #10B981;
+            background: rgba(16,185,129,0.15);
+            color: #34D399;
+        }
+
+        /* Neon total */
+        .pos-total-neon {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .pos-total-neon-label {
+            font-size: 0.75rem;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .pos-total-neon-amount {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: #00FF88;
+            text-shadow: 0 0 20px rgba(0,255,136,0.6), 0 0 40px rgba(0,255,136,0.3);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+            line-height: 1.1;
+        }
+        .pos-total-neon-discount {
+            font-size: 0.8rem;
+            color: #10B981;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* Change calculator (cash) */
+        .pos-change-block {
+            background: #0F172A;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            display: none;
+        }
+        .pos-change-block.visible { display: block; }
+        .pos-change-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .pos-change-row label {
+            font-size: 0.78rem;
+            color: #94A3B8;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .pos-change-row input {
+            width: 100px;
+            background: #1E293B;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            text-align: right;
+            outline: none;
+        }
+        .pos-change-sdacha {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px dashed #334155;
+        }
+        .pos-change-sdacha-label {
+            font-size: 0.8rem;
+            color: #94A3B8;
+            font-weight: 700;
+        }
+        .pos-change-sdacha-val {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #FBBF24;
+        }
+        .pos-cash-quick-btns {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .pos-cash-quick-btns button {
+            flex: 1;
+            background: #1E293B;
+            border: 1px solid #334155;
+            color: #CBD5E1;
+            border-radius: 5px;
+            padding: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .pos-cash-quick-btns button:hover {
+            background: #334155;
+        }
+
+        .pos-btn-pay {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+        .pos-btn-pay:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+            transform: translateY(-1px);
+        }
+        .pos-btn-clear {
+            width: 100%;
+            padding: 8px;
+            background: transparent;
+            color: #EF4444;
+            border: 1px solid #EF4444;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+        .pos-btn-clear:hover {
+            background: rgba(239,68,68,0.1);
+        }
+
+        /* =================== SHIFT REPORT BUTTONS =================== */
+        .pos-shift-report-bar {
+            padding: 8px 16px;
+            border-top: 1px solid #334155;
+            display: flex;
+            gap: 8px;
+        }
+        .pos-report-btn {
+            flex: 1;
+            padding: 8px 6px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .pos-report-btn-x {
+            background: rgba(59,130,246,0.15);
+            border: 1px solid #3B82F6;
+            color: #60A5FA;
+        }
+        .pos-report-btn-x:hover { background: rgba(59,130,246,0.3); }
+        .pos-report-btn-z {
+            background: rgba(239,68,68,0.15);
+            border: 1px solid #EF4444;
+            color: #F87171;
+        }
+        .pos-report-btn-z:hover { background: rgba(239,68,68,0.3); }
+        .pos-report-btn-shift {
+            background: rgba(16,185,129,0.15);
+            border: 1px solid #10B981;
+            color: #34D399;
+        }
+        .pos-report-btn-shift:hover { background: rgba(16,185,129,0.3); }
+
+        /* =================== RECEIPT PAPER =================== */
+        .receipt-paper {
+            background: white;
+            color: black;
+            font-family: 'Courier New', monospace;
+            padding: 24px;
+            width: 320px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .receipt-paper h4 { text-align: center; font-size: 1.1rem; margin-bottom: 4px; }
+        .receipt-line { display: flex; justify-content: space-between; }
+        .receipt-divider { border-bottom: 1px dashed black; margin: 8px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="pos-container">
+        <!-- ЛЕВАЯ ЧАСТЬ: МЕНЮ И ТОВАРЫ КАССЫ -->
+        <div class="pos-main">
+            <div class="pos-header">
+                <div class="pos-cashier-info">
+                    <a href="/" style="text-decoration:none; font-size:1.4rem;">🍕</a>
+                    <div>
+                        <strong style="font-size:1.05rem;">Касса POS — Elcho's Pizza</strong>
+                        <div style="font-size:0.78rem; color:#94A3B8;" id="posShiftHeaderInfo">Кассир: Анна Смирнова | Загрузка смены...</div>
+                    </div>
+                </div>
+
+                <!-- Shortcut keys -->
+                <div class="pos-shortcuts">
+                    <div class="pos-shortcut-pill"><kbd>F1</kbd> Поиск</div>
+                    <div class="pos-shortcut-pill"><kbd>F2</kbd> Скидка</div>
+                    <div class="pos-shortcut-pill"><kbd>ESC</kbd> Сброс</div>
+                </div>
+
+                <!-- Clock & shift timer -->
+                <div class="pos-clock-block">
+                    <div>
+                        <div class="pos-shift-timer">Смена<strong id="posShiftDuration">00:00:00</strong></div>
+                    </div>
+                    <div class="pos-clock" id="posClockDisplay">00:00:00</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div class="pos-status-badge">
+                            <span class="pos-status-dot"></span>
+                            Касса онлайн
+                        </div>
+                        <a href="/admin" class="defense-pill" target="_blank">📊 Админ</a>
+                        <a href="/" class="defense-pill">🌐 Сайт</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Категории товаров -->
+            <div class="pos-category-bar" id="posCategoryBar">
+                <button class="pos-cat-btn active" onclick="filterPosCategory('all')">Все товары</button>
+            </div>
+
+            <!-- Сетка товаров -->
+            <div class="pos-grid" id="posGrid">
+                <!-- Заполняется динамически -->
+            </div>
+
+            <!-- Hotkeys legend -->
+            <div class="pos-hotkeys-legend">
+                <span>⌨️ Горячие клавиши:</span>
+                <span><kbd>↑↓</kbd> Кол-во</span>
+                <span><kbd>Del</kbd> Удалить</span>
+                <span><kbd>Enter</kbd> Оплата</span>
+                <span><kbd>F5</kbd> Обновить</span>
+                <span><kbd>Ctrl+P</kbd> Печать</span>
+            </div>
+        </div>
+
+        <!-- ПРАВАЯ ЧАСТЬ: ТЕКУЩИЙ ЧЕК / ЗАКАЗ -->
+        <div class="pos-sidebar">
+            <div class="pos-bill-header">
+                <div>
+                    <h3 style="font-size:1.1rem; font-weight:800;">🧾 Текущий чек</h3>
+                    <div style="font-size:0.75rem; color:#94A3B8;" id="posOrderTime"></div>
+                </div>
+                <button class="pos-qty-btn" onclick="clearPosOrder()" title="Очистить чек (ESC)" style="background:#EF4444; width:28px; height:28px;">✕</button>
+            </div>
+
+            <!-- Имя клиента -->
+            <div class="pos-customer-field">
+                <input type="text" id="posCustomerName" placeholder="👤 Имя клиента (необязательно)">
+            </div>
+
+            <div style="padding: 0 16px;">
+                <div class="pos-type-toggle">
+                    <button class="pos-type-btn active" id="typeDineIn" onclick="setPosOrderType('DineIn')">🍽️ В зале</button>
+                    <button class="pos-type-btn" id="typeTakeout" onclick="setPosOrderType('Takeout')">🛍️ С собой</button>
+                </div>
+            </div>
+
+            <div class="pos-bill-items" id="posBillItems">
+                <div style="text-align:center; padding: 40px 10px; color:#64748B;">
+                    Чек пуст.<br>Нажмите на товар слева для добавления
+                </div>
+            </div>
+
+            <div class="pos-bill-footer">
+                <!-- Discount -->
+                <div class="pos-discount-row">
+                    <label>🏷️ Скидка:</label>
+                    <div class="pos-discount-input-wrap">
+                        <input type="number" id="posDiscountPct" value="0" min="0" max="100" oninput="renderPosBill()">
+                        <span>%</span>
+                    </div>
+                    <div class="pos-discount-saved" id="posDiscountSaved"></div>
+                </div>
+
+                <!-- Payment method selector -->
+                <div class="pos-payment-selector">
+                    <button class="pos-pay-method-btn active-card" id="posPay_Card" onclick="selectSidebarPayMethod('Card')">
+                        <span class="pay-icon">💳</span>Карта
+                    </button>
+                    <button class="pos-pay-method-btn" id="posPay_SBP" onclick="selectSidebarPayMethod('SBP')">
+                        <span class="pay-icon">📱</span>СБП
+                    </button>
+                    <button class="pos-pay-method-btn" id="posPay_Cash" onclick="selectSidebarPayMethod('Cash')">
+                        <span class="pay-icon">💵</span>Нал
+                    </button>
+                </div>
+
+                <!-- Neon total -->
+                <div class="pos-total-neon">
+                    <div class="pos-total-neon-label">ИТОГО К ОПЛАТЕ</div>
+                    <div class="pos-total-neon-amount" id="posTotalAmount">0 ₽</div>
+                    <div class="pos-total-neon-discount" id="posTotalDiscountLine"></div>
+                </div>
+
+                <!-- Change calculator (cash) -->
+                <div class="pos-change-block" id="posSidebarChangeBlock">
+                    <div class="pos-change-row">
+                        <label>СДАЧА — получено:</label>
+                        <input type="number" id="posSidebarCashReceived" oninput="calcSidebarChange()" placeholder="0">
+                    </div>
+                    <div class="pos-cash-quick-btns">
+                        <button onclick="setSidebarCash(500)">500</button>
+                        <button onclick="setSidebarCash(1000)">1 000</button>
+                        <button onclick="setSidebarCash(2000)">2 000</button>
+                        <button onclick="setSidebarCash(5000)">5 000</button>
+                    </div>
+                    <div class="pos-change-sdacha">
+                        <span class="pos-change-sdacha-label">💰 СДАЧА:</span>
+                        <span class="pos-change-sdacha-val" id="posSidebarSdacha">0 ₽</span>
+                    </div>
+                </div>
+
+                <button class="pos-btn-pay" onclick="openPaymentModal()">
+                    ✅ Оплатить заказ
+                </button>
+                <button class="pos-btn-clear" onclick="clearPosOrder()">
+                    Отменить чек (ESC)
+                </button>
+            </div>
+
+            <!-- X/Z Report buttons -->
+            <div class="pos-shift-report-bar">
+                <button class="pos-report-btn pos-report-btn-shift" onclick="openShiftModal()">
+                    💼 Смена
+                </button>
+                <button class="pos-report-btn pos-report-btn-x" onclick="openShiftModal(); setTimeout(()=>printXReport(), 400)">
+                    📄 X-отчёт
+                </button>
+                <button class="pos-report-btn pos-report-btn-z" onclick="openShiftModal(); setTimeout(()=>closeShiftConfirm(), 400)">
+                    🏁 Z-отчёт
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ОПЛАТЫ НА КАССЕ -->
+    <div class="modal-overlay" id="posPayModal" onclick="if(event.target === this) closeModal('posPayModal')">
+        <div class="modal-window" style="background:#1E293B; color:white; max-width:480px;">
+            <div class="modal-header" style="border-color:#334155;">
+                <h3>Приём оплаты</h3>
+                <button class="btn-close" onclick="closeModal('posPayModal')" style="color:#94A3B8;">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="font-size:1.8rem; font-weight:900; text-align:center; color:#00FF88; text-shadow: 0 0 20px rgba(0,255,136,0.5); margin-bottom:16px;">
+                    Сумма к оплате: <span id="payModalAmount">0</span> ₽
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" style="color:#CBD5E1;">Способ оплаты</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                        <button class="pos-cat-btn active" id="payMethodCard" onclick="setPosPayment('CardTerminal')" style="padding:12px 6px;">
+                            💳 Карта
+                        </button>
+                        <button class="pos-cat-btn" id="payMethodCash" onclick="setPosPayment('Cash')" style="padding:12px 6px;">
+                            💵 Наличные
+                        </button>
+                        <button class="pos-cat-btn" id="payMethodSbp" onclick="setPosPayment('SBP')" style="padding:12px 6px;">
+                            📱 СБП QR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Блок наличных: быстрый ввод купюр -->
+                <div id="cashCalcBlock" style="display:none; margin-top:14px; background:#0F172A; padding:14px; border-radius:10px;">
+                    <label class="form-label" style="color:#CBD5E1;">Получено от клиента (₽):</label>
+                    <input type="number" class="form-control" id="cashReceivedInput" style="background:#1E293B; color:white; border-color:#475569; font-size:1.2rem; font-weight:800;" oninput="calcChange()">
+                    <div style="display:flex; gap:8px; margin-top:10px;">
+                        <button class="pos-cat-btn" onclick="addCash(500)">500</button>
+                        <button class="pos-cat-btn" onclick="addCash(1000)">1 000</button>
+                        <button class="pos-cat-btn" onclick="addCash(2000)">2 000</button>
+                        <button class="pos-cat-btn" onclick="addCash(5000)">5 000</button>
+                    </div>
+                    <div style="margin-top:12px; font-size:1.15rem; font-weight:800; color:#10B981;">
+                        Сдача: <span id="cashChangeVal">0</span> ₽
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-color:#334155;">
+                <button class="pos-btn-pay" onclick="finalizePosSale()" style="width:100%;">
+                    ✅ Пробить продажу и распечатать чек
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ПРЕДПРОСМОТРА ЧЕКА -->
+    <div class="modal-overlay" id="receiptModal" onclick="if(event.target === this) closeModal('receiptModal')">
+        <div class="modal-window" style="background:#F1F5F9; max-width:380px;">
+            <div class="modal-header">
+                <h3>Кассовый чек</h3>
+                <button class="btn-close" onclick="closeModal('receiptModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 10px;">
+                <div class="receipt-paper" id="receiptPrintArea">
+                    <h4>ООО «ЭЛЧОС ПИЦЦА»</h4>
+                    <div style="text-align:center;">г. Москва, ул. Тверская, 12</div>
+                    <div style="text-align:center;">ИНН: 7701984520 | РН ККТ: 000458129034</div>
+                    <div class="receipt-divider"></div>
+                    <div class="receipt-line">
+                        <span>КАССОВЫЙ ЧЕК</span>
+                        <strong id="recOrderNum">#105</strong>
+                    </div>
+                    <div class="receipt-line">
+                        <span>Дата:</span>
+                        <span id="recDate"></span>
+                    </div>
+                    <div class="receipt-line">
+                        <span>Кассир:</span>
+                        <span>Анна Смирнова</span>
+                    </div>
+                    <div class="receipt-line">
+                        <span>Тип заказа:</span>
+                        <span id="recType">В зале</span>
+                    </div>
+                    <div class="receipt-divider"></div>
+                    <div id="recItemsList"></div>
+                    <div class="receipt-divider"></div>
+                    <div class="receipt-line" style="font-size:1.1rem; font-weight:bold;">
+                        <span>ИТОГ К ОПЛАТЕ:</span>
+                        <span id="recTotal"></span>
+                    </div>
+                    <div class="receipt-line">
+                        <span>В т.ч. НДС 20%:</span>
+                        <span id="recVat"></span>
+                    </div>
+                    <div class="receipt-line">
+                        <span>Оплата:</span>
+                        <span id="recPayment">Электронными</span>
+                    </div>
+                    <div class="receipt-divider"></div>
+                    <div style="text-align:center; margin-top:8px;">
+                        <div>[ QR-КОД ПРОВЕРКИ ФНС ]</div>
+                        <div style="font-size:1.8rem; margin: 4px 0;">🏁</div>
+                        <div style="font-size:0.75rem;">Сайт ФНС: www.nalog.gov.ru</div>
+                        <div style="font-size:0.75rem; margin-top:4px;">Спасибо за покупку! Приятного аппетита!</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-checkout" onclick="window.print()" style="width:100%;">
+                    🖨️ Напечатать чек
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО УПРАВЛЕНИЯ КАССОВОЙ СМЕНОЙ (54-ФЗ) -->
+    <div class="modal-overlay" id="shiftModal" onclick="if(event.target === this) closeModal('shiftModal')">
+        <div class="modal-window" style="background:#1E293B; color:white; max-width:480px;">
+            <div class="modal-header" style="border-color:#334155;">
+                <h3 style="display:flex; align-items:center; gap:8px;">💼 Кассовая смена (54-ФЗ)</h3>
+                <button class="btn-close" onclick="closeModal('shiftModal')" style="color:#94A3B8;">✕</button>
+            </div>
+            <div class="modal-body" id="shiftModalBody">
+                Загрузка данных смены...
+            </div>
+            <div class="modal-footer" style="border-color:#334155; display:flex; flex-direction:column; gap:8px;" id="shiftModalFooter">
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ФИСКАЛЬНОГО ОТЧЕТА (X-ОТЧЕТ / Z-ОТЧЕТ) -->
+    <div class="modal-overlay" id="fiscalReportModal" onclick="if(event.target === this) closeModal('fiscalReportModal')">
+        <div class="modal-window" style="background:#F1F5F9; max-width:380px;">
+            <div class="modal-header">
+                <h3 id="fiscalReportTitle">Фискальный отчет</h3>
+                <button class="btn-close" onclick="closeModal('fiscalReportModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 10px;">
+                <div class="receipt-paper" id="fiscalReportPaper">
+                    <!-- Заполняется JS -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-checkout" onclick="window.print()" style="width:100%;">
+                    🖨️ Напечатать отчет
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        ElchosRBAC.enforce(['Cashier', 'Admin'], 'Кассовый терминал POS');
+
+        let posProducts = [];
+        let posCategories = [];
+        let posCart = [];
+        let posOrderType = 'DineIn';
+        let posPaymentMethod = 'CardTerminal';
+        let currentShift = null;
+        let shiftStartTime = null;
+        let sidebarPayMethod = 'Card'; // Card | SBP | Cash
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('posOrderTime').textContent = new Date().toLocaleTimeString();
+            setInterval(() => {
+                document.getElementById('posOrderTime').textContent = new Date().toLocaleTimeString();
+            }, 1000);
+
+            // Real clock
+            function updateClock() {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2,'0');
+                const mm = String(now.getMinutes()).padStart(2,'0');
+                const ss = String(now.getSeconds()).padStart(2,'0');
+                document.getElementById('posClockDisplay').textContent = `${hh}:${mm}:${ss}`;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Shift timer
+            shiftStartTime = Date.now();
+            function updateShiftTimer() {
+                const elapsed = Math.floor((Date.now() - shiftStartTime) / 1000);
+                const h = String(Math.floor(elapsed / 3600)).padStart(2,'0');
+                const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2,'0');
+                const s = String(elapsed % 60).padStart(2,'0');
+                document.getElementById('posShiftDuration').textContent = `${h}:${m}:${s}`;
+            }
+            updateShiftTimer();
+            setInterval(updateShiftTimer, 1000);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') clearPosOrder();
+                if (e.key === 'Enter' && !e.target.matches('input, textarea')) openPaymentModal();
+                if (e.key === 'F2') { e.preventDefault(); document.getElementById('posDiscountPct').focus(); }
+                if (e.key === 'F5') { e.preventDefault(); renderPosGrid(posProducts); }
+            });
+
+            await loadShiftInfo();
+
+            const [cats, prods] = await Promise.all([
+                fetch('/api/categories').then(r => r.json()),
+                fetch('/api/products').then(r => r.json())
+            ]);
+            posCategories = cats;
+            posProducts = prods;
+
+            renderPosCategories();
+            renderPosGrid(posProducts);
+        });
+
+        async function loadShiftInfo() {
+            try {
+                const res = await fetch('/api/shifts/current').then(r => r.json());
+                currentShift = res;
+                const infoEl = document.getElementById('posShiftHeaderInfo');
+                if (res.hasOpenShift) {
+                    infoEl.innerHTML = `Кассир: ${res.shift.CashierName} | <span style="color:#10B981; font-weight:700;">Смена #${res.shift.Id} (Открыта)</span>`;
+                } else {
+                    infoEl.innerHTML = `Кассир: Анна Смирнова | <span style="color:#EF4444; font-weight:700;">Смена закрыта</span>`;
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки смены:', e);
+            }
+        }
+
+        async function openShiftModal() {
+            await loadShiftInfo();
+            const body = document.getElementById('shiftModalBody');
+            const footer = document.getElementById('shiftModalFooter');
+
+            if (currentShift && currentShift.hasOpenShift) {
+                const s = currentShift.shift;
+                body.innerHTML = `
+                    <div style="background:#0F172A; padding:16px; border-radius:12px; border:1px solid #334155;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span style="color:#94A3B8;">Номер смены:</span>
+                            <strong style="color:#FBBF24; font-size:1.1rem;">#${s.Id}</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span style="color:#94A3B8;">Кассир:</span>
+                            <strong>${s.CashierName}</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span style="color:#94A3B8;">Время открытия:</span>
+                            <span>${s.OpenedAt}</span>
+                        </div>
+                        <div style="border-top:1px dashed #334155; margin:10px 0;"></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span style="color:#94A3B8;">Пробито чеков:</span>
+                            <strong>${s.TotalOrders} шт.</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span style="color:#94A3B8;">Выручка (Наличные):</span>
+                            <strong style="color:#10B981;">${s.CashSales} ₽</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span style="color:#94A3B8;">Выручка (Карты / Терминал):</span>
+                            <strong style="color:#3B82F6;">${s.CardSales} ₽</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span style="color:#94A3B8;">Выручка (СБП QR):</span>
+                            <strong style="color:#A855F7;">${s.SBPSales} ₽</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span style="color:#94A3B8;">Разменный фонд (в кассе):</span>
+                            <span>${s.InitialCash} ₽</span>
+                        </div>
+                        <div style="border-top:1px dashed #334155; margin:10px 0;"></div>
+                        <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:900;">
+                            <span>Наличных в ящике:</span>
+                            <span style="color:#FBBF24;">${s.CashInDrawer} ₽</span>
+                        </div>
+                    </div>
+                `;
+                footer.innerHTML = `
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%;">
+                        <button class="pos-cat-btn" onclick="printXReport()" style="background:#3B82F6; color:white; padding:12px;">
+                            📄 X-отчет (промежуточный)
+                        </button>
+                        <button class="pos-cat-btn" onclick="closeShiftConfirm()" style="background:#EF4444; color:white; padding:12px;">
+                            🏁 Закрыть смену (Z-отчет)
+                        </button>
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `
+                    <div style="text-align:center; padding:20px; background:#0F172A; border-radius:12px;">
+                        <div style="font-size:3rem; margin-bottom:12px;">🔒</div>
+                        <h4 style="font-size:1.2rem; margin-bottom:8px;">Смена в данный момент закрыта</h4>
+                        <p style="color:#94A3B8; font-size:0.9rem; margin-bottom:16px;">Для приёма платежей и пробития чеков откройте новую смену с указанием суммы разменных наличных.</p>
+                        <div class="form-group" style="text-align:left;">
+                            <label class="form-label" style="color:#CBD5E1;">Разменный фонд в ящике кассы (₽):</label>
+                            <input type="number" id="newShiftInitialCash" class="form-control" value="5000" style="background:#1E293B; color:white; border-color:#475569; font-size:1.2rem; font-weight:800;">
+                        </div>
+                    </div>
+                `;
+                footer.innerHTML = `
+                    <button class="pos-btn-pay" onclick="openShiftSubmit()" style="width:100%;">
+                        🟢 Открыть новую смену
+                    </button>
+                `;
+            }
+            document.getElementById('shiftModal').classList.add('open');
+        }
+
+        async function openShiftSubmit() {
+            const initialCash = parseFloat(document.getElementById('newShiftInitialCash').value) || 0;
+            try {
+                const res = await fetch('/api/shifts/open', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cashierId: 2, cashierName: 'Анна Смирнова (Кассир)', initialCash: initialCash })
+                }).then(r => r.json());
+
+                if (res.success) {
+                    closeModal('shiftModal');
+                    await loadShiftInfo();
+                    alert(`Смена #${res.shiftId} успешно открыта!`);
+                }
+            } catch (err) {
+                alert('Ошибка открытия смены: ' + err);
+            }
+        }
+
+        async function printXReport() {
+            try {
+                const res = await fetch('/api/shifts/x-report').then(r => r.json());
+                if (!res.hasOpenShift) return;
+                const s = res.shift;
+                document.getElementById('fiscalReportTitle').textContent = 'X-ОТЧЕТ (БЕЗ ГАШЕНИЯ)';
+                document.getElementById('fiscalReportPaper').innerHTML = `
+                    <h4>ООО «ЭЛЧОС ПИЦЦА»</h4>
+                    <div style="text-align:center;">г. Москва, ул. Тверская, 12</div>
+                    <div style="text-align:center;">ИНН: 7701984520 | РН ККТ: 000458129034</div>
+                    <div class="receipt-divider"></div>
+                    <div style="text-align:center; font-weight:bold; font-size:1rem;">X-ОТЧЕТ (СМЕННЫЙ)</div>
+                    <div style="text-align:center; font-size:0.8rem; color:#555;">[ БЕЗ ГАШЕНИЯ СУММ ]</div>
+                    <div class="receipt-divider"></div>
+                    <div class="receipt-line"><span>Смена:</span><strong>#${s.Id}</strong></div>
+                    <div class="receipt-line"><span>Кассир:</span><span>${s.CashierName}</span></div>
+                    <div class="receipt-line"><span>Время снятия:</span><span>${new Date().toLocaleString()}</span></div>
+                    <div class="receipt-divider"></div>
+                    <div class="receipt-line"><span>Всего чеков:</span><strong>${s.TotalOrders}</strong></div>
+                    <div class="receipt-line"><span>Выручка наличными:</span><span>${s.CashSales} ₽</span></div>
+                    <div class="receipt-line"><span>Выручка безналичными:</span><span>${s.CardSales + s.SBPSales} ₽</span></div>
+                    <div class="receipt-divider"></div>
+                    <div class="receipt-line" style="font-weight:bold; font-size:1.05rem;"><span>ИТОГО ВЫРУЧКА:</span><span>${s.TotalRevenue} ₽</span></div>
+                    <div class="receipt-line"><span>В т.ч. НДС 20%:</span><span>${Math.round(s.TotalRevenue * 20 / 120)} ₽</span></div>
+                    <div class="receipt-line"><span>Наличных в ящике:</span><span>${s.CashInDrawer} ₽</span></div>
+                    <div class="receipt-divider"></div>
+                    <div style="text-align:center; margin-top:8px; font-size:0.75rem;">ФИСКАЛЬНЫЙ РЕЖИМ 54-ФЗ • ОФД АКТИВЕН</div>
+                `;
+                closeModal('shiftModal');
+                document.getElementById('fiscalReportModal').classList.add('open');
+            } catch (err) {
+                alert('Ошибка получения X-отчета: ' + err);
+            }
+        }
+
+        async function closeShiftConfirm() {
+            if (!confirm('Вы уверены, что хотите закрыть текущую смену и сформировать Z-отчет с фискальным гашением?')) return;
+            try {
+                const res = await fetch('/api/shifts/close', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(r => r.json());
+
+                if (res.success && res.zReport) {
+                    const z = res.zReport;
+                    document.getElementById('fiscalReportTitle').textContent = 'Z-ОТЧЕТ (С ГАШЕНИЕМ)';
+                    document.getElementById('fiscalReportPaper').innerHTML = `
+                        <h4>ООО «ЭЛЧОС ПИЦЦА»</h4>
+                        <div style="text-align:center;">г. Москва, ул. Тверская, 12</div>
+                        <div style="text-align:center;">ИНН: 7701984520 | РН ККТ: 000458129034</div>
+                        <div class="receipt-divider"></div>
+                        <div style="text-align:center; font-weight:bold; font-size:1.1rem; color:#B91C1C;">ОТЧЕТ О ЗАКРЫТИИ СМЕНЫ (Z-ОТЧЕТ)</div>
+                        <div style="text-align:center; font-size:0.8rem; color:#555;">[ СМЕНА ЗАКРЫТА • ФН ЗАПИСАН ]</div>
+                        <div class="receipt-divider"></div>
+                        <div class="receipt-line"><span>Номер смены:</span><strong>#${z.shiftNumber}</strong></div>
+                        <div class="receipt-line"><span>Кассир:</span><span>${z.cashier}</span></div>
+                        <div class="receipt-line"><span>Открытие смены:</span><span>${z.openedAt}</span></div>
+                        <div class="receipt-line"><span>Закрытие смены:</span><span>${z.closedAt}</span></div>
+                        <div class="receipt-divider"></div>
+                        <div class="receipt-line"><span>Продаж за смену:</span><strong>${z.totalOrders} чеков</strong></div>
+                        <div class="receipt-line"><span>Наличными:</span><span>${z.cashSales} ₽</span></div>
+                        <div class="receipt-line"><span>Безналичными (Карты):</span><span>${z.cardSales} ₽</span></div>
+                        <div class="receipt-line"><span>Безналичными (СБП):</span><span>${z.sbpSales} ₽</span></div>
+                        <div class="receipt-divider"></div>
+                        <div class="receipt-line" style="font-weight:bold; font-size:1.1rem;"><span>СМЕННЫЙ ИТОГ:</span><span>${z.totalRevenue} ₽</span></div>
+                        <div class="receipt-line"><span>НДС 20%:</span><span>${z.taxVat20} ₽</span></div>
+                        <div class="receipt-divider"></div>
+                        <div style="text-align:center; margin-top:8px;">
+                            <div>[ QR-КОД ККТ 54-ФЗ ]</div>
+                            <div style="font-size:1.8rem; margin:4px 0;">🏁</div>
+                            <div style="font-size:0.75rem;">ФД: 0000492 • ФП: 3891048192</div>
+                            <div style="font-size:0.75rem;">Смена закрыта успешно. Данные переданы в ОФД.</div>
+                        </div>
+                    `;
+                    closeModal('shiftModal');
+                    await loadShiftInfo();
+                    document.getElementById('fiscalReportModal').classList.add('open');
+                } else {
+                    alert('Не удалось закрыть смену: ' + (res.message || 'неизвестная ошибка'));
+                }
+            } catch (err) {
+                alert('Ошибка закрытия смены: ' + err);
+            }
+        }
+
+        function renderPosCategories() {
+            const bar = document.getElementById('posCategoryBar');
+            bar.innerHTML = '<button class="pos-cat-btn active" onclick="filterPosCategory(\'all\', this)">Все товары</button>' +
+                posCategories.map(c => `
+                    <button class="pos-cat-btn" onclick="filterPosCategory(${c.Id}, this)">${c.Icon || ''} ${c.Name}</button>
+                `).join('');
+        }
+
+        function filterPosCategory(catId, btn) {
+            document.querySelectorAll('.pos-cat-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            if (catId === 'all') renderPosGrid(posProducts);
+            else renderPosGrid(posProducts.filter(p => p.CategoryId === catId));
+        }
+
+        function renderPosGrid(products) {
+            const grid = document.getElementById('posGrid');
+            grid.innerHTML = products.map(p => {
+                const inStock = p.IsAvailable !== false;
+                const badgeClass = inStock ? 'in-stock' : 'stop-list';
+                const badgeTitle = inStock ? 'В наличии' : 'Стоп-лист';
+                return `
+                <div class="pos-card" onclick="addToPosOrder(${p.Id})" title="${p.Name}">
+                    <div class="pos-card-img-wrap">
+                        <img src="${p.ImageUrl || '/img/pizza_default.svg'}" class="pos-card-img" onerror="this.onerror=null; this.src='/img/pizza_default.svg';">
+                        <div class="pos-avail-badge ${badgeClass}" title="${badgeTitle}"></div>
+                        <div class="pos-card-img-overlay">
+                            <div class="pos-card-img-title">${p.Name}</div>
+                        </div>
+                    </div>
+                    <div class="pos-card-body">
+                        <span class="pos-card-price">${p.BasePrice} ₽</span>
+                        <span class="pos-card-add-btn">+</span>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function addToPosOrder(productId) {
+            const prod = posProducts.find(p => p.Id === productId);
+            if (!prod) return;
+
+            const existing = posCart.find(it => it.productId === productId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                posCart.push({
+                    productId: prod.Id,
+                    productName: prod.Name,
+                    sizeName: prod.IsPizza ? 'Средняя 30 см' : null,
+                    doughName: prod.IsPizza ? 'Традиционное' : null,
+                    selectedToppings: [],
+                    unitPrice: prod.BasePrice,
+                    quantity: 1
+                });
+            }
+            renderPosBill();
+        }
+
+        function getDiscountPct() {
+            return Math.min(100, Math.max(0, parseFloat(document.getElementById('posDiscountPct').value) || 0));
+        }
+
+        function renderPosBill() {
+            const list = document.getElementById('posBillItems');
+            const totalEl = document.getElementById('posTotalAmount');
+
+            if (posCart.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding: 40px 10px; color:#64748B;">Чек пуст.<br>Нажмите на товар слева для добавления</div>';
+                totalEl.textContent = '0 ₽';
+                document.getElementById('posDiscountSaved').textContent = '';
+                document.getElementById('posTotalDiscountLine').textContent = '';
+                return;
+            }
+
+            let subtotal = 0;
+            list.innerHTML = posCart.map((it, idx) => {
+                const itemTotal = it.unitPrice * it.quantity;
+                subtotal += itemTotal;
+                return `
+                    <div class="pos-bill-item">
+                        <div class="pos-item-info">
+                            <div class="pos-item-name">${it.productName}</div>
+                            <div class="pos-item-meta">${it.sizeName ? it.sizeName : ''} ${it.unitPrice} ₽</div>
+                        </div>
+                        <div class="pos-item-qty">
+                            <button class="pos-qty-btn" onclick="changePosQty(${idx}, -1)">−</button>
+                            <span style="font-weight:700; min-width:16px; text-align:center;">${it.quantity}</span>
+                            <button class="pos-qty-btn" onclick="changePosQty(${idx}, 1)">+</button>
+                        </div>
+                        <div class="pos-item-price">${itemTotal} ₽</div>
+                    </div>
+                `;
+            }).join('');
+
+            const discountPct = getDiscountPct();
+            const discountAmt = Math.round(subtotal * discountPct / 100);
+            const total = subtotal - discountAmt;
+
+            totalEl.textContent = total + ' ₽';
+
+            if (discountPct > 0) {
+                document.getElementById('posDiscountSaved').textContent = `−${discountAmt} ₽`;
+                document.getElementById('posTotalDiscountLine').textContent = `Скидка ${discountPct}%: −${discountAmt} ₽`;
+            } else {
+                document.getElementById('posDiscountSaved').textContent = '';
+                document.getElementById('posTotalDiscountLine').textContent = '';
+            }
+
+            // Update sidebar change calculator
+            calcSidebarChange();
+        }
+
+        function changePosQty(idx, delta) {
+            posCart[idx].quantity += delta;
+            if (posCart[idx].quantity <= 0) posCart.splice(idx, 1);
+            renderPosBill();
+        }
+
+        function clearPosOrder() {
+            posCart = [];
+            renderPosBill();
+        }
+
+        function setPosOrderType(type) {
+            posOrderType = type;
+            document.getElementById('typeDineIn').classList.toggle('active', type === 'DineIn');
+            document.getElementById('typeTakeout').classList.toggle('active', type === 'Takeout');
+        }
+
+        // Sidebar payment method
+        function selectSidebarPayMethod(method) {
+            sidebarPayMethod = method;
+            document.getElementById('posPay_Card').className = 'pos-pay-method-btn' + (method === 'Card' ? ' active-card' : '');
+            document.getElementById('posPay_SBP').className = 'pos-pay-method-btn' + (method === 'SBP' ? ' active-sbp' : '');
+            document.getElementById('posPay_Cash').className = 'pos-pay-method-btn' + (method === 'Cash' ? ' active-cash' : '');
+
+            const changeBlock = document.getElementById('posSidebarChangeBlock');
+            if (method === 'Cash') {
+                changeBlock.classList.add('visible');
+                // Set posPaymentMethod so modal inherits it
+                posPaymentMethod = 'Cash';
+            } else {
+                changeBlock.classList.remove('visible');
+                posPaymentMethod = method === 'Card' ? 'CardTerminal' : 'SBP';
+            }
+        }
+
+        function setSidebarCash(amount) {
+            document.getElementById('posSidebarCashReceived').value = amount;
+            calcSidebarChange();
+        }
+
+        function calcSidebarChange() {
+            const subtotal = posCart.reduce((s, it) => s + (it.unitPrice * it.quantity), 0);
+            const discountPct = getDiscountPct();
+            const total = subtotal - Math.round(subtotal * discountPct / 100);
+            const received = parseFloat(document.getElementById('posSidebarCashReceived').value) || 0;
+            const change = Math.max(0, received - total);
+            document.getElementById('posSidebarSdacha').textContent = change + ' ₽';
+        }
+
+        function openPaymentModal() {
+            if (posCart.length === 0) {
+                alert('Добавьте позиции в чек перед оплатой');
+                return;
+            }
+            const subtotal = posCart.reduce((sum, it) => sum + (it.unitPrice * it.quantity), 0);
+            const discountPct = getDiscountPct();
+            const total = subtotal - Math.round(subtotal * discountPct / 100);
+            document.getElementById('payModalAmount').textContent = total;
+            document.getElementById('cashReceivedInput').value = total;
+            calcChange();
+            document.getElementById('posPayModal').classList.add('open');
+        }
+
+        function setPosPayment(method) {
+            posPaymentMethod = method;
+            document.getElementById('payMethodCard').classList.toggle('active', method === 'CardTerminal');
+            document.getElementById('payMethodCash').classList.toggle('active', method === 'Cash');
+            document.getElementById('payMethodSbp').classList.toggle('active', method === 'SBP');
+
+            document.getElementById('cashCalcBlock').style.display = method === 'Cash' ? 'block' : 'none';
+        }
+
+        function addCash(amount) {
+            const input = document.getElementById('cashReceivedInput');
+            input.value = amount;
+            calcChange();
+        }
+
+        function calcChange() {
+            const subtotal = posCart.reduce((sum, it) => sum + (it.unitPrice * it.quantity), 0);
+            const discountPct = getDiscountPct();
+            const total = subtotal - Math.round(subtotal * discountPct / 100);
+            const received = parseFloat(document.getElementById('cashReceivedInput').value) || 0;
+            const change = Math.max(0, received - total);
+            document.getElementById('cashChangeVal').textContent = change;
+        }
+
+        async function finalizePosSale() {
+            const subtotal = posCart.reduce((sum, it) => sum + (it.unitPrice * it.quantity), 0);
+            const discountPct = getDiscountPct();
+            const discountAmt = Math.round(subtotal * discountPct / 100);
+            const customerName = document.getElementById('posCustomerName').value.trim() || 'Гость пиццерии (Касса)';
+
+            const payload = {
+                orderType: posOrderType,
+                customerName: customerName,
+                paymentMethod: posPaymentMethod,
+                discountPercent: discountPct,
+                discountAmount: discountAmt,
+                items: posCart
+            };
+
+            try {
+                const res = await fetch('/api/pos/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(r => r.json());
+
+                if (res.success) {
+                    closeModal('posPayModal');
+
+                    // Заполняем чек
+                    document.getElementById('recOrderNum').textContent = res.orderNumber;
+                    document.getElementById('recDate').textContent = new Date().toLocaleString();
+                    document.getElementById('recType').textContent = posOrderType === 'DineIn' ? 'В зале' : 'С собой (На вынос)';
+                    document.getElementById('recTotal').textContent = res.totalAmount + ' ₽';
+                    document.getElementById('recVat').textContent = (Math.round(res.totalAmount * 20 / 120)) + ' ₽';
+                    document.getElementById('recPayment').textContent = posPaymentMethod === 'Cash' ? 'Наличные' : 'Банковская карта';
+
+                    document.getElementById('recItemsList').innerHTML = posCart.map(it => `
+                        <div class="receipt-line">
+                            <span>${it.productName} x${it.quantity}</span>
+                            <span>${it.unitPrice * it.quantity} ₽</span>
+                        </div>
+                    `).join('');
+
+                    clearPosOrder();
+                    document.getElementById('receiptModal').classList.add('open');
+                }
+            } catch (err) {
+                alert('Ошибка создания заказа на сервере: ' + err);
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+    </script>
+</body>
+</html>

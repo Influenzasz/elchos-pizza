@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elcho's Pizza — Официальный сайт пиццерии</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍕</text></svg>">
+    <script src="/js/rbac.js"></script>
+    <style>
+        /* ── PROMO TICKER ── */
+        .promo-ticker-wrap{background:linear-gradient(90deg,#c0392b,#e67e22);overflow:hidden;padding:7px 0;position:relative;z-index:10;}
+        .promo-ticker-track{display:flex;white-space:nowrap;animation:tickerScroll 32s linear infinite;}
+        .promo-ticker-track:hover{animation-play-state:paused;}
+        .promo-ticker-item{display:inline-flex;align-items:center;gap:10px;padding:0 36px;font-size:.82rem;font-weight:800;color:#fff;letter-spacing:.4px;text-transform:uppercase;}
+        .promo-ticker-item span.sep{opacity:.4;}
+        @keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+        /* ── HERO ── */
+        .hero-section{background:linear-gradient(135deg,#FF6900 0%,#c0392b 55%,#7B1A0C 100%);position:relative;overflow:hidden;padding:70px 24px 56px;text-align:center;}
+        .hero-section::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+        .hero-float-pizza{position:absolute;font-size:8rem;opacity:.08;animation:floatPizza 7s ease-in-out infinite;pointer-events:none;}
+        .hero-float-pizza.p1{top:-20px;left:5%;animation-delay:0s;}
+        .hero-float-pizza.p2{bottom:-30px;right:4%;animation-delay:3.5s;}
+        @keyframes floatPizza{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-24px) rotate(8deg)}}
+        .hero-inner{position:relative;z-index:2;max-width:860px;margin:0 auto;}
+        .hero-eyebrow{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:50px;padding:5px 18px;font-size:.78rem;font-weight:800;color:#FFE0B2;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;}
+        .hero-headline{font-size:clamp(2rem,6vw,3.6rem);font-weight:900;line-height:1.1;background:linear-gradient(to right,#fff 30%,#FFD580);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:14px;}
+        .hero-sub{font-size:1.05rem;color:rgba(255,255,255,.85);max-width:540px;margin:0 auto 36px;line-height:1.6;}
+        /* Promo badge cards */
+        .hero-badges{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+        .promo-badge-card{background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:18px 22px;min-width:200px;text-align:center;cursor:pointer;transition:transform .25s,box-shadow .25s,background .25s;}
+        .promo-badge-card:hover{transform:translateY(-6px) scale(1.03);background:rgba(255,255,255,.22);box-shadow:0 16px 40px rgba(0,0,0,.25);}
+        .promo-badge-card .badge-icon{font-size:1.8rem;margin-bottom:6px;}
+        .promo-badge-card .badge-title{font-size:.85rem;font-weight:800;color:#fff;margin-bottom:4px;}
+        .promo-badge-card .badge-desc{font-size:.75rem;color:rgba(255,255,255,.75);}
+        /* Promo code chips */
+        .promo-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+        .promo-chip{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border:1.5px dashed rgba(255,255,255,.5);border-radius:50px;padding:7px 18px;font-size:.82rem;font-weight:900;color:#fff;letter-spacing:1px;cursor:pointer;transition:background .2s,transform .2s;}
+        .promo-chip:hover{background:rgba(255,255,255,.28);transform:scale(1.05);}
+        .promo-chip::before{content:'🏷️';}
+        /* Countdown */
+        .hero-countdown{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);border-radius:14px;padding:10px 22px;font-size:.82rem;color:rgba(255,255,255,.8);}
+        .hero-countdown .cd-num{font-size:1.6rem;font-weight:900;color:#FFD580;min-width:34px;text-align:center;font-variant-numeric:tabular-nums;}
+        .hero-countdown .cd-label{font-size:.62rem;text-transform:uppercase;color:rgba(255,255,255,.55);}
+        .cd-sep{font-size:1.4rem;font-weight:900;color:#FFD580;margin:0 2px;}
+
+        /* ── STICKY CATEGORY BAR ── */
+        .category-bar-sticky{position:sticky;top:62px;z-index:90;background:#fff;border-bottom:2px solid #FFEDD5;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:0 16px;}
+        .category-bar-sticky .category-nav{display:flex;gap:8px;overflow-x:auto;padding:10px 0;scrollbar-width:none;}
+        .category-bar-sticky .category-nav::-webkit-scrollbar{display:none;}
+        .category-bar-sticky .cat-pill{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;padding:7px 18px;border-radius:50px;border:1.5px solid #E2E8F0;background:#F8FAFC;font-size:.85rem;font-weight:700;color:#475569;cursor:pointer;transition:background .2s,border-color .2s,color .2s;text-decoration:none;}
+        .category-bar-sticky .cat-pill:hover{border-color:#FF6900;color:#FF6900;}
+        .category-bar-sticky .cat-pill.active{background:linear-gradient(135deg,#FF6900,#c0392b);border-color:transparent;color:#fff;}
+
+        /* ── PRODUCT CARD EXTRAS ── */
+        .card-wishlist{position:absolute;top:10px;right:10px;width:34px;height:34px;background:rgba(255,255,255,.9);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);transition:transform .2s,background .2s;z-index:5;}
+        .card-wishlist:hover{transform:scale(1.15);background:#fff;}
+        .card-wishlist.active{background:#FFF0F0;}
+        .badge-popular{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:50px;text-transform:uppercase;letter-spacing:.5px;z-index:5;}
+        .badge-new{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#3B82F6,#1D4ED8);color:#fff;font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:50px;text-transform:uppercase;letter-spacing:.5px;z-index:5;}
+        .price-original{font-size:.8rem;color:#94A3B8;text-decoration:line-through;margin-right:6px;}
+        /* Quantity selector on card */
+        .card-qty-selector{display:flex;align-items:center;gap:0;border:1.5px solid #E2E8F0;border-radius:10px;overflow:hidden;}
+        .card-qty-selector button{width:32px;height:32px;border:none;background:#F8FAFC;color:#374151;font-size:1.1rem;font-weight:800;cursor:pointer;transition:background .15s;}
+        .card-qty-selector button:hover{background:#FFEDD5;color:#FF6900;}
+        .card-qty-selector .qty-val{min-width:32px;text-align:center;font-weight:800;font-size:.9rem;color:#1E293B;}
+        .card-add-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;}
+
+        /* ── FEATURES / QUALITY SECTION ── */
+        .features-section{background:#fff;border-top:1px solid var(--border,#E2E8F0);border-bottom:1px solid var(--border,#E2E8F0);padding:60px 24px;margin-top:40px;}
+        .feature-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:30px;}
+        .feature-item{display:flex;gap:16px;align-items:flex-start;opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease;}
+        .feature-item.in-view{opacity:1;transform:translateY(0);}
+        .feature-icon{font-size:2.2rem;padding:14px;border-radius:16px;flex-shrink:0;}
+        .feature-icon.orange{background:#FFF7ED;color:var(--primary,#FF6900);}
+        .feature-icon.green{background:#ECFDF5;color:#10B981;}
+        .feature-icon.blue{background:#EFF6FF;color:#3B82F6;}
+        .feature-icon.yellow{background:#FEF3C7;color:#F59E0B;}
+        .feature-text h4{font-size:1.1rem;font-weight:800;color:#1E293B;margin-bottom:6px;}
+        .feature-text p{font-size:.88rem;color:#64748B;line-height:1.5;}
+
+        /* ── LOYALTY SECTION ── */
+        .loyalty-section{background:linear-gradient(135deg,#1E293B 0%,#0F172A 100%);padding:70px 24px;margin-top:0;text-align:center;position:relative;overflow:hidden;}
+        .loyalty-section::before{content:'🍕';font-size:12rem;position:absolute;right:-40px;top:50%;transform:translateY(-50%);opacity:.04;pointer-events:none;}
+        .loyalty-inner{max-width:900px;margin:0 auto;position:relative;z-index:2;}
+        .loyalty-badge{display:inline-block;background:linear-gradient(135deg,#FF6900,#FFB347);border-radius:50px;padding:5px 20px;font-size:.78rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;}
+        .loyalty-title{font-size:clamp(1.6rem,4vw,2.5rem);font-weight:900;color:#fff;margin-bottom:12px;}
+        .loyalty-sub{font-size:1rem;color:rgba(255,255,255,.65);max-width:560px;margin:0 auto 36px;}
+        .loyalty-steps{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin-bottom:36px;}
+        .loyalty-step{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:22px 24px;min-width:150px;flex:1;max-width:200px;}
+        .loyalty-step .ls-icon{font-size:2rem;margin-bottom:10px;}
+        .loyalty-step .ls-num{font-size:2rem;font-weight:900;color:#FF6900;margin-bottom:4px;}
+        .loyalty-step .ls-label{font-size:.8rem;color:rgba(255,255,255,.65);}
+        .loyalty-btn{display:inline-block;background:linear-gradient(135deg,#FF6900,#c0392b);color:#fff;font-size:1rem;font-weight:800;padding:14px 36px;border-radius:50px;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+        .loyalty-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,105,0,.4);}
+
+        /* ── HOW IT WORKS ── */
+        .how-section{padding:70px 24px;background:#F8FAFC;}
+        .how-inner{max-width:1100px;margin:0 auto;}
+        .section-eyebrow{text-align:center;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#FF6900;margin-bottom:10px;}
+        .section-title{text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);font-weight:900;color:#1E293B;margin-bottom:48px;}
+        .how-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px;}
+        .how-step{text-align:center;position:relative;}
+        .how-step::after{content:'→';position:absolute;right:-18px;top:36px;font-size:1.4rem;color:#CBD5E1;font-weight:900;}
+        .how-step:last-child::after{display:none;}
+        .how-step-num{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#FF6900,#c0392b);color:#fff;font-size:1.7rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(255,105,0,.3);}
+        .how-step h4{font-size:1.05rem;font-weight:800;color:#1E293B;margin-bottom:8px;}
+        .how-step p{font-size:.87rem;color:#64748B;line-height:1.5;}
+
+        /* ── REVIEWS (enhanced) ── */
+        .reviews-section{max-width:1280px;margin:50px auto 30px;padding:0 24px;}
+        .reviews-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+        .reviews-header h3{font-size:1.5rem;font-weight:900;color:#1E293B;}
+        .reviews-header p{font-size:.9rem;color:#64748B;margin-top:4px;}
+        #reviewsGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;}
+        /* JS-rendered review cards get these classes added */
+        .review-card-modern{background:#fff;border:1px solid #E2E8F0;border-radius:18px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .2s,box-shadow .2s;}
+        .review-card-modern:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.1);}
+        .review-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#fff;flex-shrink:0;}
+        .review-stars{color:#F59E0B;font-size:1rem;letter-spacing:1px;}
+        .review-verified{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:700;color:#10B981;background:#ECFDF5;padding:3px 8px;border-radius:50px;}
+
+        /* ── FOOTER MODERN ── */
+        .footer-social-row{display:flex;gap:12px;margin-top:14px;}
+        .footer-social-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:8px 14px;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.75);text-decoration:none;transition:background .2s,color .2s;}
+        .footer-social-btn:hover{background:rgba(255,105,0,.3);color:#fff;border-color:#FF6900;}
+        .footer-apps-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+        .footer-app-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;text-decoration:none;color:#fff;transition:background .2s;}
+        .footer-app-badge:hover{background:rgba(255,255,255,.18);}
+        .footer-app-badge .app-store-text{display:flex;flex-direction:column;}
+        .footer-app-badge .app-store-text span:first-child{font-size:.62rem;color:rgba(255,255,255,.65);}
+        .footer-app-badge .app-store-text span:last-child{font-size:.85rem;font-weight:800;}
+        .footer-hours{margin-top:12px;font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.8;}
+        .footer-hours strong{color:#FF6900;}
+    </style>
+</head>
+<body>
+
+    <!-- ПРОКРУЧИВАЮЩИЙСЯ РЕКЛАМНЫЙ ТИКЕР -->
+    <div class="promo-ticker-wrap" aria-label="Акции и промокоды">
+        <div class="promo-ticker-track">
+            <!-- Two copies for seamless loop -->
+            <span class="promo-ticker-item">🔥 Горячая пицца за 30 минут или промокод на бесплатную! <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🏷️ Промокод ELCHOS20 — скидка 20% на весь заказ <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🍕 Элчос Спешл с сырным бортиком — хит сезона! <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🎁 Промокод ELCHOS15 — −15% для новых гостей <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🛵 Бесплатная доставка от 800 ₽ <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🏷️ Промокод PIZZA10 — −10% на пиццы! <span class="sep">|</span></span>
+            <span class="promo-ticker-item">⭐ Программа лояльности — копи баллы и получай пиццу бесплатно! <span class="sep">|</span></span>
+            <!-- Duplicate for seamless loop -->
+            <span class="promo-ticker-item">🔥 Горячая пицца за 30 минут или промокод на бесплатную! <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🏷️ Промокод ELCHOS20 — скидка 20% на весь заказ <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🍕 Элчос Спешл с сырным бортиком — хит сезона! <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🎁 Промокод ELCHOS15 — −15% для новых гостей <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🛵 Бесплатная доставка от 800 ₽ <span class="sep">|</span></span>
+            <span class="promo-ticker-item">🏷️ Промокод PIZZA10 — −10% на пиццы! <span class="sep">|</span></span>
+            <span class="promo-ticker-item">⭐ Программа лояльности — копи баллы и получай пиццу бесплатно! <span class="sep">|</span></span>
+        </div>
+    </div>
+
+    <!-- ВЕРХНЯЯ ИНФОРМАЦИОННАЯ ПАНЕЛЬ -->
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <div class="top-bar-left">
+                <span class="top-bar-badge">Доставка 30 мин</span>
+                <span>Быстрая доставка горячей пиццы прямо из печи!</span>
+            </div>
+            <div class="top-bar-right">
+                <span>📍 Москва и МО</span>
+                <a href="tel:88005550020" class="top-bar-link">📞 8 800 555-00-20 (Единый колл-центр)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПАНЕЛЬ БЫСТРОГО ДОСТУПА К РАБОЧИМ МОДУЛЯМ СИСТЕМЫ -->
+    <div class="defense-bar" style="background:#1F2937;">
+        <div class="defense-bar-inner">
+            <div class="defense-title" id="rbacStaffTitle" style="color:#FBBF24;">
+                🏢 <strong>Рабочие модули Elcho's Pizza:</strong>
+            </div>
+            <div class="defense-links" id="rbacNavLinks">
+                <a href="/" class="defense-pill active">🍕 Сайт онлайн-заказа</a>
+                <a href="/pos" class="defense-pill" data-allowed="Cashier,Admin" target="_blank">🖥️ Касса POS</a>
+                <a href="/kitchen" class="defense-pill" data-allowed="Chef,Admin" target="_blank">👨‍🍳 Кухня KDS</a>
+                <a href="/board" class="defense-pill" target="_blank">📺 Табло в зале</a>
+                <a href="/kiosk" class="defense-pill" target="_blank">📱 Киоск зала</a>
+                <a href="/courier" class="defense-pill" data-allowed="Courier,Admin" target="_blank">🛵 Курьер PWA</a>
+                <a href="/admin" class="defense-pill" data-allowed="Admin" target="_blank">📊 Панель управления</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ГЛАВНАЯ ЛИПКАЯ ШАПКА -->
+    <header class="main-header">
+        <div class="header-container">
+            <a href="/" class="logo-box">
+                <div class="logo-icon">🍕</div>
+                <div class="logo-text">
+                    <h1>ELCHO'S PIZZA</h1>
+                    <span>PIZZERIA &amp; RESTAURANT</span>
+                </div>
+            </a>
+
+            <!-- Навигация по категориям меню (dynamic via JS) -->
+            <nav class="category-nav" id="categoryNav">
+                <!-- Заполняется динамически из JS -->
+            </nav>
+
+            <!-- Кнопки действий -->
+            <div class="header-actions">
+                <button class="history-btn" onclick="openOrderTracker()" id="trackerBtn" title="Отследить статус заказа">
+                    📦 Трекер заказа
+                </button>
+                <button class="user-btn" id="userBtn" onclick="openAuthModal()">
+                    👤 Войти
+                </button>
+                <button class="cart-button" onclick="toggleCart()">
+                    <span>Корзина</span>
+                    <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
+                    <span id="cartHeaderPrice"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- STICKY CATEGORY BAR -->
+    <div class="category-bar-sticky" id="stickyCategories">
+        <nav class="category-nav" aria-label="Категории меню">
+            <a href="#cat-pizzas"   class="cat-pill active">🍕 Пиццы</a>
+            <a href="#cat-snacks"   class="cat-pill">🍗 Закуски</a>
+            <a href="#cat-desserts" class="cat-pill">🍰 Десерты</a>
+            <a href="#cat-drinks"   class="cat-pill">🥤 Напитки</a>
+            <a href="#cat-combos"   class="cat-pill">🎁 Комбо</a>
+        </nav>
+    </div>
+
+    <!-- АКЦИОННЫЙ БАННЕР HERO (FULL-WIDTH ANIMATED) -->
+    <section class="hero-section">
+        <div class="hero-float-pizza p1">🍕</div>
+        <div class="hero-float-pizza p2">🍕</div>
+        <div class="hero-inner">
+            <div class="hero-eyebrow">🔥 Горячо &amp; Быстро &amp; Вкусно</div>
+            <h2 class="hero-headline">ГОРЯЧАЯ ПИЦЦА<br>ЗА 30 МИНУТ</h2>
+            <p class="hero-sub">Фирменные рецепты, настоящая моцарелла и сырный бортик — доставляем прямо из дровяной печи</p>
+
+            <!-- 3 Promo Badge Cards -->
+            <div class="hero-badges">
+                <div class="promo-badge-card">
+                    <div class="badge-icon">🏷️</div>
+                    <div class="badge-title">Скидка 20%</div>
+                    <div class="badge-desc">Elcho's Special &amp; Сырный бортик</div>
+                </div>
+                <div class="promo-badge-card">
+                    <div class="badge-icon">🛵</div>
+                    <div class="badge-title">Бесплатная доставка</div>
+                    <div class="badge-desc">При заказе от 800 ₽ по Москве</div>
+                </div>
+                <div class="promo-badge-card">
+                    <div class="badge-icon">🎁</div>
+                    <div class="badge-title">Подарок новичку</div>
+                    <div class="badge-desc">−15% на первый заказ онлайн</div>
+                </div>
+            </div>
+
+            <!-- Promo Code Chips -->
+            <div class="promo-chips">
+                <span class="promo-chip" title="Нажмите чтобы скопировать" onclick="navigator.clipboard&&navigator.clipboard.writeText('ELCHOS20')">ELCHOS20</span>
+                <span class="promo-chip" title="Нажмите чтобы скопировать" onclick="navigator.clipboard&&navigator.clipboard.writeText('ELCHOS15')">ELCHOS15</span>
+                <span class="promo-chip" title="Нажмите чтобы скопировать" onclick="navigator.clipboard&&navigator.clipboard.writeText('PIZZA10')">PIZZA10</span>
+            </div>
+
+            <!-- Animated countdown -->
+            <div class="hero-countdown" id="heroCountdown" aria-label="Таймер доставки">
+                <span style="color:rgba(255,255,255,.7);font-size:.88rem;">Доставим через:</span>
+                <div>
+                    <div class="cd-num" id="cdH">00</div>
+                    <div class="cd-label">ч</div>
+                </div>
+                <span class="cd-sep">:</span>
+                <div>
+                    <div class="cd-num" id="cdM">29</div>
+                    <div class="cd-label">мин</div>
+                </div>
+                <span class="cd-sep">:</span>
+                <div>
+                    <div class="cd-num" id="cdS">59</div>
+                    <div class="cd-label">сек</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ МЕНЮ -->
+    <main id="menuContainer">
+        <div style="text-align:center; padding: 60px; color: #64748B;">
+            <div style="font-size: 2rem; margin-bottom: 10px;">🍕</div>
+            Загрузка свежего меню Elcho's Pizza...
+        </div>
+    </main>
+
+    <!-- СТАНДАРТЫ КАЧЕСТВА И ГАРАНТИИ ELCHO'S PIZZA -->
+    <section class="features-section" id="featuresSection">
+        <div class="feature-grid">
+            <div class="feature-item">
+                <div class="feature-icon orange">⏱️</div>
+                <div class="feature-text">
+                    <h4>Доставка до 35 минут</h4>
+                    <p>Если курьер не успеет в течение 60 минут — дарим промокод на бесплатную большую пиццу.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon green">🧀</div>
+                <div class="feature-text">
+                    <h4>100% сыр Моцарелла</h4>
+                    <p>Никаких заменителей молочного жира. Только настоящее фермерское молоко высшего сорта.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon blue">🔥</div>
+                <div class="feature-text">
+                    <h4>Выпекаем при 300°C</h4>
+                    <p>Профессиональные подовые конвейерные печи обеспечивают хрустящую корочку и сочную начинку.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon yellow">🛡️</div>
+                <div class="feature-text">
+                    <h4>Контроль свежести</h4>
+                    <p>Автоматизированный WMS-склад списывает ингредиенты по FIFO-стандарту пищевой безопасности.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- КАК ЭТО РАБОТАЕТ -->
+    <section class="how-section">
+        <div class="how-inner">
+            <div class="section-eyebrow">🚀 Просто и быстро</div>
+            <h2 class="section-title">Как это работает</h2>
+            <div class="how-steps">
+                <div class="how-step">
+                    <div class="how-step-num">1</div>
+                    <h4>Выберите пиццу</h4>
+                    <p>Листайте меню, выбирайте любимые позиции, настраивайте размер и тесто.</p>
+                </div>
+                <div class="how-step">
+                    <div class="how-step-num">2</div>
+                    <h4>Оформите заказ</h4>
+                    <p>Укажите адрес доставки, выберите удобный способ оплаты — онлайн или наличными.</p>
+                </div>
+                <div class="how-step">
+                    <div class="how-step-num">3</div>
+                    <h4>Мы готовим</h4>
+                    <p>Заказ сразу попадает на кухню. Следите за статусом в реальном времени через трекер.</p>
+                </div>
+                <div class="how-step">
+                    <div class="how-step-num">4</div>
+                    <h4>Получите и наслаждайтесь</h4>
+                    <p>Горячая пицца у вашей двери за 30 минут. Приятного аппетита!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПРОГРАММА ЛОЯЛЬНОСТИ -->
+    <section class="loyalty-section">
+        <div class="loyalty-inner">
+            <div class="loyalty-badge">⭐ Программа лояльности</div>
+            <h2 class="loyalty-title">Копи баллы — получай<br>пиццу бесплатно!</h2>
+            <p class="loyalty-sub">За каждый рубль в заказе — 1 балл. 500 баллов = бесплатная пицца Маргарита. Это просто!</p>
+            <div class="loyalty-steps">
+                <div class="loyalty-step">
+                    <div class="ls-icon">🛵</div>
+                    <div class="ls-num">1₽</div>
+                    <div class="ls-label">= 1 балл за каждый рубль</div>
+                </div>
+                <div class="loyalty-step">
+                    <div class="ls-icon">🎁</div>
+                    <div class="ls-num">500</div>
+                    <div class="ls-label">баллов = бесплатная пицца</div>
+                </div>
+                <div class="loyalty-step">
+                    <div class="ls-icon">🏆</div>
+                    <div class="ls-num">×2</div>
+                    <div class="ls-label">баллы по пятницам и выходным</div>
+                </div>
+                <div class="loyalty-step">
+                    <div class="ls-icon">🌟</div>
+                    <div class="ls-num">VIP</div>
+                    <div class="ls-label">статус от 5000 баллов</div>
+                </div>
+            </div>
+            <button class="loyalty-btn" onclick="openAuthModal()">Зарегистрироваться и начать копить</button>
+        </div>
+    </section>
+
+    <!-- ОТЗЫВЫ ГОСТЕЙ О ПИЦЦЕРИИ -->
+    <section class="reviews-section">
+        <div class="reviews-header">
+            <div>
+                <h3>Отзывы наших гостей</h3>
+                <p>Честные оценки реальных покупателей Elcho's Pizza</p>
+            </div>
+            <button class="btn-primary" onclick="openReviewModalDirect()" style="padding: 10px 18px; border-radius: 10px; font-weight: 700; background: var(--primary); color: white; border: none; cursor: pointer;">
+                ✍️ Написать отзыв
+            </button>
+        </div>
+        <div id="reviewsGrid">
+            <!-- Заполняется динамически -->
+        </div>
+    </section>
+
+    <!-- ВЫЕЗЖАЮЩАЯ КОРЗИНА (DRAWER) -->
+    <div class="cart-drawer-overlay" id="cartDrawer" onclick="if(event.target === this) toggleCart()">
+        <div class="cart-drawer">
+            <div class="cart-header">
+                <h2>Ваша корзина</h2>
+                <button class="btn-close" onclick="toggleCart()">✕</button>
+            </div>
+
+            <div class="cart-body">
+                <div class="cart-empty" id="cartEmpty">
+                    <div class="cart-empty-icon">🛒</div>
+                    <h3>Ваша корзина пуста</h3>
+                    <p>Выберите любимую фирменную пиццу, закуски или десерты из меню</p>
+                </div>
+                <div id="cartItemsList"></div>
+            </div>
+
+            <div class="cart-footer" id="cartFooter" style="display:none;">
+                <div class="promo-input-group">
+                    <input type="text" class="promo-input" id="promoInput" placeholder="Промокод (ELCHOS20)">
+                    <button class="promo-btn" onclick="applyPromocode()">Применить</button>
+                </div>
+
+                <div class="summary-line">
+                    <span>Подытог</span>
+                    <span id="cartSubtotal">0 ₽</span>
+                </div>
+                <div class="summary-line">
+                    <span>Скидка по промокоду</span>
+                    <span id="cartDiscount" style="color: var(--primary);">0 ₽</span>
+                </div>
+                <div class="summary-line">
+                    <span>Доставка</span>
+                    <span style="color: var(--success); font-weight:700;">Бесплатно</span>
+                </div>
+                <div class="summary-line total">
+                    <span>Сумма к оплате</span>
+                    <span id="cartTotal">0 ₽</span>
+                </div>
+
+                <button class="btn-checkout" onclick="openCheckoutModal()">
+                    Оформить заказ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО КАСТОМИЗАЦИИ ПИЦЦЫ -->
+    <div class="modal-overlay" id="customPizzaModal" onclick="if(event.target === this) closeModal('customPizzaModal')">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3 id="customPizzaTitle">Настройка пиццы</h3>
+                <button class="btn-close" onclick="closeModal('customPizzaModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="pizza-custom-body">
+                    <div class="pizza-preview-wrap">
+                        <img src="/img/pizza_default.svg" alt="Пицца" class="pizza-preview-img" id="customPizzaImg" onerror="this.onerror=null; this.src='/img/pizza_default.svg';">
+                        <div id="customPizzaMeta" style="font-size: 0.85rem; color: #64748B; margin-top: 10px; font-weight: 600;"></div>
+                    </div>
+                    <div>
+                        <p id="customPizzaDesc" style="font-size: 0.9rem; color: #64748B; margin-bottom: 16px;"></p>
+
+                        <!-- Размер -->
+                        <div class="form-group">
+                            <label class="form-label">Размер пиццы</label>
+                            <div class="segmented-control" id="sizeControl">
+                                <button class="segment-btn" data-size="Маленькая 25 см" onclick="setCustomSize('Маленькая 25 см')">25 см</button>
+                                <button class="segment-btn active" data-size="Средняя 30 см" onclick="setCustomSize('Средняя 30 см')">30 см</button>
+                                <button class="segment-btn" data-size="Большая 35 см" onclick="setCustomSize('Большая 35 см')">35 см</button>
+                            </div>
+                        </div>
+
+                        <!-- Тесто -->
+                        <div class="form-group">
+                            <label class="form-label">Тип теста</label>
+                            <div class="segmented-control" id="doughControl">
+                                <button class="segment-btn active" data-dough="Традиционное" onclick="setCustomDough('Традиционное')">Традиционное</button>
+                                <button class="segment-btn" data-dough="Тонкое" onclick="setCustomDough('Тонкое')">Тонкое</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Добавки к пицце -->
+                <div style="margin-top: 20px;">
+                    <label class="form-label">Добавить по вкусу (ингредиенты и сырный бортик)</label>
+                    <div class="toppings-list" id="toppingsContainer"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-checkout" id="btnAddToOrderCustom" onclick="addCustomizedPizzaToCart()" style="width: 100%;">
+                    Добавить в корзину
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ОФОРМЛЕНИЯ ЗАКАЗА -->
+    <div class="modal-overlay" id="checkoutModal" onclick="if(event.target === this) closeModal('checkoutModal')">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Оформление заказа</h3>
+                <button class="btn-close" onclick="closeModal('checkoutModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Способ получения -->
+                <div class="form-group">
+                    <label class="form-label">Способ получения</label>
+                    <div style="display:flex; gap:16px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="orderType" value="Delivery" checked onchange="document.getElementById('addressGroup').style.display = 'block';">
+                            <span>🛵 Доставка курьером</span>
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="orderType" value="Takeout" onchange="document.getElementById('addressGroup').style.display = 'none';">
+                            <span>🛍️ Самовывоз из пиццерии</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Контактные данные -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                    <div class="form-group">
+                        <label class="form-label">Ваше имя *</label>
+                        <input type="text" class="form-control" id="checkoutName" placeholder="Иван">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Номер телефона *</label>
+                        <input type="tel" class="form-control" id="checkoutPhone" placeholder="+7 (999) 000-00-00">
+                    </div>
+                </div>
+
+                <!-- Адрес -->
+                <div class="form-group" id="addressGroup">
+                    <label class="form-label">Адрес доставки *</label>
+                    <input type="text" class="form-control" id="checkoutAddress" placeholder="г. Москва, ул. Центральная, д. 10, кв. 25">
+                </div>
+
+                <!-- Комментарий -->
+                <div class="form-group">
+                    <label class="form-label">Комментарий к заказу</label>
+                    <input type="text" class="form-control" id="checkoutComment" placeholder="Домофон 25, позвонить за 5 минут">
+                </div>
+
+                <!-- Способ оплаты -->
+                <div class="form-group">
+                    <label class="form-label">Способ оплаты</label>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="paymentMethod" value="CardOnline" checked>
+                            <span>💳 Банковской картой онлайн</span>
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="paymentMethod" value="SBP">
+                            <span>📱 Оплата через СБП (QR-код)</span>
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="paymentMethod" value="Cash">
+                            <span>💵 Наличными курьеру при получении</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-checkout" id="checkoutTotalBtn" onclick="submitOrder()" style="width: 100%;">
+                    Оплатить заказ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ЖИВОГО ТРЕКЕРА ЗАКАЗА -->
+    <div class="modal-overlay" id="trackerModal" onclick="if(event.target === this) closeModal('trackerModal')">
+        <div class="modal-window" style="max-width: 680px;">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <h3>Статус заказа <span id="trackerOrderNumber" style="color:var(--primary);">#---</span></h3>
+                    <span id="trackerTypeBadge" class="badge" style="background:#FFEDD5; color:#C2410C; font-size:0.8rem; padding:4px 10px;">🛵 Доставка</span>
+                </div>
+                <button class="btn-close" onclick="closeModal('trackerModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <!-- Панель быстрого поиска заказа -->
+                <div id="trackerSearchToggle" style="margin-bottom: 16px; text-align: right;">
+                    <a href="javascript:void(0)" onclick="toggleTrackerSearch()" style="font-size: 0.85rem; color: var(--primary); font-weight: 700; text-decoration: none;">
+                        🔍 Найти другой заказ по номеру / телефону
+                    </a>
+                </div>
+
+                <div id="trackerSearchBox" style="display:none; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px; margin-bottom:20px;">
+                    <label style="font-size:0.85rem; font-weight:700; color:#475569; display:block; margin-bottom:8px;">
+                        Отследить заказ по номеру (например, #105) или номеру телефона:
+                    </label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="trackerSearchInput" class="form-control" placeholder="#105 или +7 (999) 000-00-00" style="flex:1;">
+                        <button class="btn-primary" onclick="searchAndTrackOrder()" style="padding:10px 20px; font-weight:700; border-radius:8px; background:var(--primary); color:white; border:none; cursor:pointer;">
+                            Найти
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Главный статус и таймер -->
+                <div id="trackerLiveStatusCard" style="background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%); border: 1px solid #FDBA74; border-radius: 16px; padding: 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                    <div>
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom: 6px;">
+                            <span class="live-beacon"></span>
+                            <span style="font-size: 0.8rem; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 0.5px;">Живой трекинг в реальном времени</span>
+                        </div>
+                        <div id="trackerStatusDesc" style="font-size: 1.25rem; font-weight: 900; color: #7C2D12; line-height: 1.3;">
+                            Заказ принят и передан на кухню
+                        </div>
+                        <div id="trackerSubDesc" style="font-size: 0.85rem; color: #9A3412; font-weight: 600; margin-top: 4px;">
+                            Шеф-повар раскатывает тесто и готовит ингредиенты
+                        </div>
+                    </div>
+                    <div style="text-align: right; min-width: 130px; background: white; padding: 10px 14px; border-radius: 12px; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.1);">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #94A3B8; text-transform: uppercase;">Ожидание</div>
+                        <div id="trackerTimerEta" style="font-size: 1.35rem; font-weight: 900; color: var(--primary);">~30 мин</div>
+                    </div>
+                </div>
+
+                <!-- Линейка этапов выполнения -->
+                <div class="tracker-steps" id="trackerStepsContainer">
+                    <div class="tracker-step" id="step-Created">
+                        <div class="tracker-icon">📝</div>
+                        <span>Принят</span>
+                    </div>
+                    <div class="tracker-step" id="step-Cooking">
+                        <div class="tracker-icon">👨‍🍳</div>
+                        <span>Готовится</span>
+                    </div>
+                    <div class="tracker-step" id="step-Oven">
+                        <div class="tracker-icon">🔥</div>
+                        <span>В печи</span>
+                    </div>
+                    <div class="tracker-step" id="step-Ready">
+                        <div class="tracker-icon">📦</div>
+                        <span>Собран</span>
+                    </div>
+                    <div class="tracker-step" id="step-OnTheWay">
+                        <div class="tracker-icon">🛵</div>
+                        <span id="stepLabelTransit">В пути</span>
+                    </div>
+                    <div class="tracker-step" id="step-Delivered">
+                        <div class="tracker-icon">🎉</div>
+                        <span>Доставлен</span>
+                    </div>
+                </div>
+
+                <!-- Детали и состав заказа -->
+                <div id="trackerDetailsCard" style="background:#F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 18px; margin-top: 20px;">
+                    <div style="font-size: 0.95rem; font-weight: 800; color: #1E293B; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>📦 Содержимое заказа</span>
+                        <span id="trackerItemsCount" style="font-size: 0.8rem; color: #64748B;">0 позиций</span>
+                    </div>
+
+                    <!-- Список блюд -->
+                    <div id="trackerItemsList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px; max-height: 180px; overflow-y:auto; padding-right: 4px;">
+                        <!-- Заполняется динамически -->
+                    </div>
+
+                    <!-- Реквизиты доставки и оплаты -->
+                    <div style="border-top: 1px dashed #CBD5E1; padding-top: 14px; font-size: 0.85rem; color: #64748B;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span>Адрес получения:</span>
+                            <span id="trackerDeliveryAddress" style="font-weight:700; color:#1E293B; text-align:right; max-width:60%;">ул. Центральная, д. 10</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span>Получатель:</span>
+                            <span id="trackerCustomerName" style="font-weight:700; color:#1E293B;">-</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span>Оплата:</span>
+                            <span id="trackerPaymentMethod" style="font-weight:700; color:#1E293B;">Картой онлайн (Оплачено)</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size: 1.1rem; font-weight: 900; color: var(--primary); margin-top: 10px; border-top: 1px solid #E2E8F0; padding-top: 10px;">
+                            <span>Итого к оплате:</span>
+                            <span id="trackerTotalAmount">0 ₽</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Кнопка оставить отзыв (если доставлен) -->
+                <div id="trackerReviewAction" style="display:none; margin-top: 18px; text-align: center;">
+                    <button class="btn-primary" onclick="openReviewModalFromTracker()" style="width:100%; padding: 12px; font-weight: 800; border-radius: 12px; background: #10B981; border:none; color:white; cursor:pointer;">
+                        ⭐ Оценить пиццу и обслуживание
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПЛАВАЮЩИЙ ЖИВОЙ МИНИ-ТРЕКЕР ЗАКАЗА -->
+    <div class="floating-tracker" id="floatingTracker" style="display:none;" onclick="openOrderTracker()">
+        <div class="floating-tracker-pulse"></div>
+        <div style="flex:1;">
+            <div style="font-size:0.75rem; text-transform:uppercase; font-weight:800; color:#EA580C; letter-spacing:0.5px;">
+                Живой трекер • <span id="floatOrderNumber">#---</span>
+            </div>
+            <div id="floatStatusText" style="font-size:0.92rem; font-weight:800; color:#1E293B; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:260px;">
+                Заказ принят и готовится...
+            </div>
+        </div>
+        <div style="font-size:1.1rem; color:var(--primary); font-weight:900;">➔</div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ЛИЧНОГО КАБИНЕТА И ИСТОРИИ ЗАКАЗОВ -->
+    <div class="modal-overlay" id="profileModal" onclick="if(event.target === this) closeModal('profileModal')">
+        <div class="modal-window" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Личный кабинет гостя</h3>
+                <button class="btn-close" onclick="closeModal('profileModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <div style="display:flex; align-items:center; gap:16px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border);">
+                    <div style="width:56px; height:56px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:900;">
+                        👤
+                    </div>
+                    <div style="flex:1;">
+                        <div style="display:flex; align-items:center;">
+                            <h4 id="profileName" style="font-size:1.15rem; font-weight:800; color:#1E293B;">Петр Клиентов</h4>
+                            <span id="profileRoleBadge" class="badge-pill" style="position:static; margin-left:8px; background:#FF6900; color:white; font-size:0.75rem;">Клиент</span>
+                        </div>
+                        <div id="profilePhone" style="font-size:0.85rem; color:#64748B;">+7 (999) 111-22-33</div>
+                        <div id="profileEmail" style="font-size:0.85rem; color:#94A3B8;">client@elchos.ru</div>
+                    </div>
+                    <button class="defense-pill" onclick="logoutUser()" style="padding: 8px 14px; font-size:0.85rem;">
+                        Выйти 🚪
+                    </button>
+                </div>
+
+                <!-- БЫСТРАЯ СМЕНА РОЛИ (RBAC) -->
+                <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px; margin-bottom:20px;">
+                    <div style="font-size:0.8rem; font-weight:800; color:#475569; text-transform:uppercase; margin-bottom:8px;">
+                        Тестирование ролевой модели доступа (RBAC):
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap:6px;">
+                        <button class="defense-pill" onclick="demoLogin('Client')" style="justify-content:center; padding:6px; font-size:0.8rem;">👤 Клиент</button>
+                        <button class="defense-pill" onclick="demoLogin('Cashier')" style="justify-content:center; padding:6px; font-size:0.8rem;">💳 Кассир</button>
+                        <button class="defense-pill" onclick="demoLogin('Chef')" style="justify-content:center; padding:6px; font-size:0.8rem;">👨‍🍳 Повар</button>
+                        <button class="defense-pill" onclick="demoLogin('Courier')" style="justify-content:center; padding:6px; font-size:0.8rem;">🛵 Курьер</button>
+                        <button class="defense-pill" onclick="demoLogin('Admin')" style="justify-content:center; padding:6px; font-size:0.8rem; background:#FF6900;">👑 Админ</button>
+                    </div>
+                </div>
+
+                <h4 style="font-size:1rem; font-weight:800; margin-bottom:14px; color:#1E293B; display:flex; justify-content:space-between; align-items:center;">
+                    <span>📜 Мои заказы</span>
+                    <span id="profileOrdersCount" style="font-size:0.8rem; font-weight:600; color:#64748B;">0 заказов</span>
+                </h4>
+                <div id="profileOrdersList" style="display:flex; flex-direction:column; gap:12px; max-height:280px; overflow-y:auto;">
+                    <div style="text-align:center; padding:30px; color:#94A3B8;">Загрузка истории заказов...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ОТЗЫВА О ЗАКАЗЕ -->
+    <div class="modal-overlay" id="reviewModal" onclick="if(event.target === this) closeModal('reviewModal')">
+        <div class="modal-window" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>Оставить отзыв о заказе</h3>
+                <button class="btn-close" onclick="closeModal('reviewModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <div style="text-align:center; margin-bottom: 20px;">
+                    <div style="font-size: 0.9rem; color: #64748B;">Оцените качество пиццы и скорость доставки:</div>
+                    <div id="starRatingContainer" style="display:flex; justify-content:center; gap:8px; margin: 12px 0; font-size: 2rem; cursor: pointer;">
+                        <span class="star-btn" data-rating="1" onclick="setRating(1)">⭐</span>
+                        <span class="star-btn" data-rating="2" onclick="setRating(2)">⭐</span>
+                        <span class="star-btn" data-rating="3" onclick="setRating(3)">⭐</span>
+                        <span class="star-btn" data-rating="4" onclick="setRating(4)">⭐</span>
+                        <span class="star-btn" data-rating="5" onclick="setRating(5)">⭐</span>
+                    </div>
+                    <div id="ratingLabel" style="font-size: 0.9rem; font-weight: 800; color: #F59E0B;">Отлично! Очень вкусно (5 из 5)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ваш комментарий или пожелание</label>
+                    <textarea class="form-control" id="reviewComment" rows="3" placeholder="Пицца была горячая, сырный бортик просто супер! Доставили вовремя."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ваше имя</label>
+                    <input type="text" class="form-control" id="reviewCustomerName" placeholder="Иван">
+                </div>
+                <button class="btn-checkout" onclick="submitCustomerReview()" style="width: 100%; margin-top: 10px;">
+                    Отправить отзыв
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ / РЕГИСТРАЦИИ -->
+    <div class="modal-overlay" id="authModal" onclick="if(event.target === this) closeModal('authModal')">
+        <div class="modal-window" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>Вход в личный кабинет</h3>
+                <button class="btn-close" onclick="closeModal('authModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Табы Вход / Регистрация -->
+                <div style="display:flex; border-bottom: 2px solid var(--border-light); margin-bottom: 20px;">
+                    <button class="segment-btn active auth-tab" id="tab-login" onclick="switchAuthTab('login')" style="padding: 10px; font-size: 1rem;">
+                        Вход
+                    </button>
+                    <button class="segment-btn auth-tab" id="tab-register" onclick="switchAuthTab('register')" style="padding: 10px; font-size: 1rem;">
+                        Регистрация
+                    </button>
+                </div>
+
+                <!-- Форма входа -->
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email или Телефон</label>
+                        <input type="text" class="form-control" id="authLogin" placeholder="client@elchos.ru">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="authPass" placeholder="client123">
+                    </div>
+                    <button class="btn-checkout" onclick="handleLoginSubmit()" style="width: 100%; margin-top: 10px;">
+                        Войти
+                    </button>
+                </div>
+
+                <!-- Форма регистрации -->
+                <div id="registerForm" style="display:none;">
+                    <div class="form-group">
+                        <label class="form-label">ФИО</label>
+                        <input type="text" class="form-control" id="regName" placeholder="Петров Иван Васильевич">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="regEmail" placeholder="ivan@mail.ru">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Телефон</label>
+                        <input type="tel" class="form-control" id="regPhone" placeholder="+7 (999) 123-45-67">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="regPass" placeholder="••••••••">
+                    </div>
+                    <button class="btn-checkout" onclick="handleRegisterSubmit()" style="width: 100%; margin-top: 10px;">
+                        Зарегистрироваться
+                    </button>
+                </div>
+
+                <!-- БЛОК БЫСТРОГО ПЕРЕКЛЮЧЕНИЯ РОЛЕЙ СОТРУДНИКОВ -->
+                <div style="margin-top: 24px; padding-top: 18px; border-top: 1px dashed var(--border);">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 10px;">
+                        Учетные записи персонала:
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button class="defense-pill" onclick="demoLogin('Client')" style="justify-content:center; padding:8px;">
+                            👤 Клиент
+                        </button>
+                        <button class="defense-pill" onclick="demoLogin('Cashier')" style="justify-content:center; padding:8px;">
+                            🖥️ Кассир
+                        </button>
+                        <button class="defense-pill" onclick="demoLogin('Chef')" style="justify-content:center; padding:8px;">
+                            👨‍🍳 Шеф-повар
+                        </button>
+                        <button class="defense-pill" onclick="demoLogin('Courier')" style="justify-content:center; padding:8px;">
+                            🛵 Курьер
+                        </button>
+                    </div>
+                    <button class="defense-pill" onclick="demoLogin('Admin')" style="width:100%; justify-content:center; padding:8px; margin-top: 8px; background: #FF6900;">
+                        👑 Управляющий / Администратор
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПОДВАЛ (FOOTER) -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>🍕 Elcho's Pizza</h4>
+                <p>Сеть пиццерий премиум-класса с собственной службой быстрой доставки.</p>
+                <p style="margin-top: 8px; font-size: 0.85rem;">Автоматизированная система управления предприятием общественного питания (Enterprise Restaurant Management System).</p>
+
+                <!-- Часы работы -->
+                <div class="footer-hours">
+                    <strong>Часы работы:</strong><br>
+                    Пн–Пт: 10:00 — 23:00<br>
+                    Сб–Вс: 10:00 — 00:00<br>
+                    Доставка: ежедневно
+                </div>
+
+                <!-- Социальные сети -->
+                <div class="footer-social-row">
+                    <a href="#" class="footer-social-btn" aria-label="ВКонтакте">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.862-.525-2.049-1.714-1.032-1-1.49-1.135-1.745-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4 8.57 4 8.096c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.677.863 2.49 2.303 4.675 2.896 4.675.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.744c.373 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.254-1.406 2.151-3.574 2.151-3.574.119-.254.322-.491.763-.491h1.744c.525 0 .644.27.525.643-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.05.17.49-.085.745-.576.745z"/></svg>
+                        ВКонтакте
+                    </a>
+                    <a href="#" class="footer-social-btn" aria-label="Telegram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                        Telegram
+                    </a>
+                </div>
+
+                <!-- App badges -->
+                <div class="footer-apps-row">
+                    <a href="#" class="footer-app-badge">
+                        <span style="font-size:1.6rem;">🍎</span>
+                        <div class="app-store-text">
+                            <span>Скачать в</span>
+                            <span>App Store</span>
+                        </div>
+                    </a>
+                    <a href="#" class="footer-app-badge">
+                        <span style="font-size:1.6rem;">▶️</span>
+                        <div class="app-store-text">
+                            <span>Скачать в</span>
+                            <span>Google Play</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Меню</h4>
+                <ul>
+                    <li><a href="#cat-pizzas">🍕 Пиццы</a></li>
+                    <li><a href="#cat-snacks">🍗 Закуски</a></li>
+                    <li><a href="#cat-desserts">🍰 Десерты</a></li>
+                    <li><a href="#cat-drinks">🥤 Напитки</a></li>
+                    <li><a href="#cat-combos">🎁 Комбо наборы</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Рабочие модули</h4>
+                <ul>
+                    <li><a href="/pos">Кассовый терминал POS</a></li>
+                    <li><a href="/kitchen">Кухонный дисплей KDS</a></li>
+                    <li><a href="/board">Табло готовности в зале</a></li>
+                    <li><a href="/kiosk">Терминал самообслуживания</a></li>
+                    <li><a href="/courier">Мобильный экран курьера</a></li>
+                    <li><a href="/admin">Панель управления</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Контакты</h4>
+                <p>ООО «Элчос Пицца»</p>
+                <p>Единый номер: <strong>8 800 555-00-20</strong></p>
+                <p>Почта: info@elchos.ru</p>
+                <p style="margin-top: 8px;">2026 год</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Elcho's Pizza Enterprise Suite. Все права защищены.</span>
+            <span>Commercial Restaurant Management System</span>
+        </div>
+    </footer>
+
+    <!-- СКРИПТ ПРИЛОЖЕНИЯ -->
+    <script src="/js/app.js"></script>
+
+    <script>
+    // ── Hero countdown timer (counts up from 00:00, resets every 30 min) ──
+    (function(){
+        var TOTAL = 30 * 60; // 30 minutes in seconds
+        var remaining = TOTAL;
+        function pad(n){return String(n).padStart(2,'0');}
+        function tick(){
+            if(remaining <= 0) remaining = TOTAL;
+            var m = Math.floor(remaining / 60);
+            var s = remaining % 60;
+            var el = document.getElementById('cdM');
+            var es = document.getElementById('cdS');
+            if(el) el.textContent = pad(m);
+            if(es) es.textContent = pad(s);
+            remaining--;
+        }
+        tick();
+        setInterval(tick, 1000);
+    })();
+
+    // ── IntersectionObserver for feature-item scroll animations ──
+    (function(){
+        var items = document.querySelectorAll('.feature-item');
+        if(!items.length) return;
+        var io = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){
+                if(e.isIntersecting){
+                    e.target.classList.add('in-view');
+                    io.unobserve(e.target);
+                }
+            });
+        },{threshold:0.15});
+        items.forEach(function(el,i){
+            el.style.transitionDelay = (i * 0.1) + 's';
+            io.observe(el);
+        });
+    })();
+
+    // ── Sticky category pill active state on click ──
+    (function(){
+        var pills = document.querySelectorAll('.category-bar-sticky .cat-pill');
+        pills.forEach(function(pill){
+            pill.addEventListener('click', function(){
+                pills.forEach(function(p){ p.classList.remove('active'); });
+                this.classList.add('active');
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

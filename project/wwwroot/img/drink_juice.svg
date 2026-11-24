@@ -1,0 +1,16 @@
+﻿<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='juice' x1='0%' y1='0%' x2='100%' y2='0%'>
+      <stop offset='0%' stop-color='#E65100'/><stop offset='50%' stop-color='#FF9800'/><stop offset='100%' stop-color='#F57C00'/>
+    </linearGradient>
+    <filter id='dropJ'><feDropShadow dx='0' dy='6' stdDeviation='8' flood-color='#000' flood-opacity='0.2'/></filter>
+  </defs>
+  <!-- Bottle body -->
+  <rect x='155' y='110' width='90' height='190' rx='20' fill='url(#juice)' filter='url(#dropJ)'/>
+  <!-- Neck and Cap -->
+  <rect x='180' y='80' width='40' height='30' fill='#FFB74D'/>
+  <rect x='175' y='65' width='50' height='18' rx='4' fill='#2E7D32'/>
+  <!-- Fruit slice icon -->
+  <circle cx='200' cy='200' r='25' fill='#FFF3E0'/>
+  <circle cx='200' cy='200' r='20' fill='#FF9800'/>
+</svg>

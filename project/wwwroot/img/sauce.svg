@@ -1,0 +1,14 @@
+﻿<svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='sauceGrad' x1='0%' y1='0%' x2='100%' y2='0%'>
+      <stop offset='0%' stop-color='#FBC02D'/><stop offset='100%' stop-color='#F57F17'/>
+    </linearGradient>
+    <filter id='dropSauce'><feDropShadow dx='0' dy='6' stdDeviation='8' flood-color='#000' flood-opacity='0.2'/></filter>
+  </defs>
+  <!-- Cup base -->
+  <path d='M130,180 L270,180 L245,280 L155,280 Z' fill='#FAFAFA' filter='url(#dropSauce)'/>
+  <!-- Dip rim -->
+  <ellipse cx='200' cy='180' rx='70' ry='25' fill='#E0E0E0'/>
+  <!-- Sauce inside -->
+  <ellipse cx='200' cy='180' rx='62' ry='20' fill='url(#sauceGrad)'/>
+</svg>

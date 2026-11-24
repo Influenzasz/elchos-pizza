@@ -1,0 +1,476 @@
+{
+  "project/appsettings.json": {
+    "mtime": 1794950630.0175848,
+    "seen": 1795245757.5646267,
+    "ast_hash": "22339bd102427ae060d0ca57b11d4d62",
+    "semantic_hash": ""
+  },
+  "project/src/ApiHandler.cs": {
+    "mtime": 1794957323.2085648,
+    "seen": 1795245757.5646267,
+    "ast_hash": "7a39e9893b4e80b6cee529718bf46234",
+    "semantic_hash": ""
+  },
+  "project/src/Database.cs": {
+    "mtime": 1794949950.4966505,
+    "seen": 1795245757.5646267,
+    "ast_hash": "7b1b581c2e3dccdf00dbb1b54f19e349",
+    "semantic_hash": ""
+  },
+  "project/src/DbInitializer.cs": {
+    "mtime": 1794955478.7352357,
+    "seen": 1795245757.5646267,
+    "ast_hash": "758ed656c36cea8cdea855d43ba0ba1b",
+    "semantic_hash": ""
+  },
+  "project/src/EventBus.cs": {
+    "mtime": 1794949823.8147573,
+    "seen": 1795245757.5646267,
+    "ast_hash": "5f8a44e84bc18b2cafc4162720acf41e",
+    "semantic_hash": ""
+  },
+  "project/src/HttpServer.cs": {
+    "mtime": 1794949846.1531696,
+    "seen": 1795245757.5646267,
+    "ast_hash": "4c682cb9a1c2b7a2ff731d384dc20383",
+    "semantic_hash": ""
+  },
+  "project/src/LauncherApp.cs": {
+    "mtime": 1794956371.292948,
+    "seen": 1795245757.5646267,
+    "ast_hash": "a33d8ea8cf47663c7e3b80c7299051e6",
+    "semantic_hash": ""
+  },
+  "project/src/Program.cs": {
+    "mtime": 1794950892.6461487,
+    "seen": 1795245757.5646267,
+    "ast_hash": "5d597c3f50f2a256514d0bfb8ceb7bab",
+    "semantic_hash": ""
+  },
+  "project/src/TestSuite.cs": {
+    "mtime": 1794957348.9366632,
+    "seen": 1795245757.5646267,
+    "ast_hash": "ad8dc8de7dfaf4cbbbaa246328251ccc",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/js/app.js": {
+    "mtime": 1794957200.7673244,
+    "seen": 1795245757.5646267,
+    "ast_hash": "eb9f687f8041ea690021781207b3981b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/js/rbac.js": {
+    "mtime": 1794956877.4133174,
+    "seen": 1795245757.5646267,
+    "ast_hash": "95f0a8cab69cc2e2a3498546c6ae0678",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1794957428.8307586,
+    "seen": 1795245757.5646267,
+    "ast_hash": "fef31fbaae1a38155a2dd071cf1ed66d",
+    "semantic_hash": ""
+  },
+  "graphify-out/converted/\u0414\u0417_\u0417\u0430\u0449\u0438\u0442\u0430_\u0418\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u0438_\u042d\u043b\u0447\u043e\u0441_\u041f\u0438\u0446\u0446\u0430_cd40b636.md": {
+    "mtime": 1795245756.847106,
+    "seen": 1795245757.5646267,
+    "ast_hash": "0f17a5c5afde56b2b2fd7a6d09057963",
+    "semantic_hash": ""
+  },
+  "project/README.md": {
+    "mtime": 1794954141.5602138,
+    "seen": 1795245757.5646267,
+    "ast_hash": "676be0ab933075461e7131b9c7992990",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/admin.html": {
+    "mtime": 1795200988.3155787,
+    "seen": 1795245757.5646267,
+    "ast_hash": "e7842713a31c3bb3816d6fdb89f5020f",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/board.html": {
+    "mtime": 1795175650.3494828,
+    "seen": 1795245757.5646267,
+    "ast_hash": "856943c4a3c711ec6dafad55ff0266fb",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/courier.html": {
+    "mtime": 1795175595.9690087,
+    "seen": 1795245757.5646267,
+    "ast_hash": "8f964687e0f19543b26153c48da28160",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/index.html": {
+    "mtime": 1795175661.2459989,
+    "seen": 1795245757.5646267,
+    "ast_hash": "667dff29b35573bf7f0e732dc10583a4",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/kiosk.html": {
+    "mtime": 1795202095.004977,
+    "seen": 1795245757.5646267,
+    "ast_hash": "a7024520c5c3e3d13ee035c15058418b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/kitchen.html": {
+    "mtime": 1795175520.8188732,
+    "seen": 1795245757.5646267,
+    "ast_hash": "64709c41328d8822491cb7a450a5ede9",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/pos.html": {
+    "mtime": 1795175649.2305748,
+    "seen": 1795245757.5646267,
+    "ast_hash": "a830837b4b6942055c568018d695b8ed",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/combo_41.png": {
+    "mtime": 1794952889.0801468,
+    "seen": 1795245757.5646267,
+    "ast_hash": "5e85f1b0803c054e3fc79eb57aef6af1",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/combo_42.png": {
+    "mtime": 1794953879.9695656,
+    "seen": 1795245757.5646267,
+    "ast_hash": "a98a5a986f8be3605a2bdde9e779bf52",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/combo_43.png": {
+    "mtime": 1794952889.8970265,
+    "seen": 1795245757.5646267,
+    "ast_hash": "5e85f1b0803c054e3fc79eb57aef6af1",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/combo_44.png": {
+    "mtime": 1794952890.054341,
+    "seen": 1795245757.5646267,
+    "ast_hash": "90d25ff4f1bed2c8d25854f87fe9a66b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/combo_box.svg": {
+    "mtime": 1794952479.9638777,
+    "seen": 1795245757.5646267,
+    "ast_hash": "0399fe1c97a08139f274ece15820eb9b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/dessert_23.png": {
+    "mtime": 1794953879.628889,
+    "seen": 1795245757.5646267,
+    "ast_hash": "169985f0728718aec8d80df50b26b33e",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/dessert_24.png": {
+    "mtime": 1794953879.659031,
+    "seen": 1795245757.5646267,
+    "ast_hash": "3fe82519270c2be54f75b5b153af6052",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/dessert_25.png": {
+    "mtime": 1794953879.6912045,
+    "seen": 1795245757.5646267,
+    "ast_hash": "4efe3e840d097a4f0e9eb85360848e19",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/dessert_26.png": {
+    "mtime": 1794953879.7225943,
+    "seen": 1795245757.5646267,
+    "ast_hash": "e8d9bcc9cb4bcfefa816bda41ee24e97",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/dessert_27.png": {
+    "mtime": 1794953879.7538798,
+    "seen": 1795245757.5646267,
+    "ast_hash": "b058aaa7ebfe03b4f50a36ba4f2b61c1",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/dessert_cheesecake.svg": {
+    "mtime": 1794952479.9623768,
+    "seen": 1795245757.5646267,
+    "ast_hash": "11b41914bd67f42f0bb2fd3be55ab135",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/dessert_fondant.svg": {
+    "mtime": 1794952479.9623768,
+    "seen": 1795245757.5646267,
+    "ast_hash": "620bb9dce9c7a1723922f8f5d3d86fa7",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_28.png": {
+    "mtime": 1794952883.8457797,
+    "seen": 1795245757.5646267,
+    "ast_hash": "169a4cf97cb6493b275d005ba762901b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_29.png": {
+    "mtime": 1794952883.9782827,
+    "seen": 1795245757.5646267,
+    "ast_hash": "169a4cf97cb6493b275d005ba762901b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_30.png": {
+    "mtime": 1794952884.1195922,
+    "seen": 1795245757.5646267,
+    "ast_hash": "8066cee870bc37687e089c1ca8c7207f",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_31.png": {
+    "mtime": 1794953879.7825792,
+    "seen": 1795245757.5646267,
+    "ast_hash": "23a1ffb960b891029c778a331191723c",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_32.png": {
+    "mtime": 1794952884.8003874,
+    "seen": 1795245757.5646267,
+    "ast_hash": "8066cee870bc37687e089c1ca8c7207f",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_33.png": {
+    "mtime": 1794952884.9404213,
+    "seen": 1795245757.5646267,
+    "ast_hash": "58f1fdc4b8154d03ed2edc14434ee612",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_34.png": {
+    "mtime": 1794953202.9188852,
+    "seen": 1795245757.5646267,
+    "ast_hash": "f0d80a636fb0f289b0e1c44c070c67e8",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_35.png": {
+    "mtime": 1794953203.2710154,
+    "seen": 1795245757.5646267,
+    "ast_hash": "9fb6ec4755e01d1eaaf858eab7573abe",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_36.png": {
+    "mtime": 1794953203.3174422,
+    "seen": 1795245757.5646267,
+    "ast_hash": "830b7c184994f96f61c886e6eb309d83",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_coffee.svg": {
+    "mtime": 1794952479.963377,
+    "seen": 1795245757.5646267,
+    "ast_hash": "31449e4fef77bb9f6e44af13be077613",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_cola.svg": {
+    "mtime": 1794952479.962879,
+    "seen": 1795245757.5646267,
+    "ast_hash": "767e85e4ff25571cb71c10733de3f4b8",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/drink_juice.svg": {
+    "mtime": 1794952479.962879,
+    "seen": 1795245757.5646267,
+    "ast_hash": "921d4907bff81ab8b74662889610cd5b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_1.png": {
+    "mtime": 1794952870.2840424,
+    "seen": 1795245757.5646267,
+    "ast_hash": "d6d988fb94509a44f79cffb208492964",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_10.png": {
+    "mtime": 1794952874.9629505,
+    "seen": 1795245757.5646267,
+    "ast_hash": "83f8d5a1da4b61fc300f9b9f451792e2",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_11.png": {
+    "mtime": 1794953487.0043862,
+    "seen": 1795245757.5646267,
+    "ast_hash": "f28f5c7ef56bfe3b8949c393531d6640",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_12.png": {
+    "mtime": 1794953487.1612236,
+    "seen": 1795245757.5646267,
+    "ast_hash": "a654c3b8f32e5d698dd9cfb22164f7f2",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_13.png": {
+    "mtime": 1794953487.2721622,
+    "seen": 1795245757.5646267,
+    "ast_hash": "98bd718a12710c577fe9da469083993f",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_14.png": {
+    "mtime": 1794953487.437606,
+    "seen": 1795245757.5646267,
+    "ast_hash": "33d5532156b4b570cf941b78f130aba7",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_15.png": {
+    "mtime": 1794953487.4813874,
+    "seen": 1795245757.5646267,
+    "ast_hash": "dae171ec9f932c2847a9ce23d40a042b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_2.png": {
+    "mtime": 1794953486.3324437,
+    "seen": 1795245757.5646267,
+    "ast_hash": "7f27db8d85a5f1150160c6bc3c09391e",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_3.png": {
+    "mtime": 1794952871.9406831,
+    "seen": 1795245757.5646267,
+    "ast_hash": "90d25ff4f1bed2c8d25854f87fe9a66b",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_4.png": {
+    "mtime": 1794952872.4773686,
+    "seen": 1795245757.5646267,
+    "ast_hash": "b2c493c3831c095922ebf09cb93fd885",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_5.png": {
+    "mtime": 1794953486.4591122,
+    "seen": 1795245757.5646267,
+    "ast_hash": "61ee7c59c924bac12ce514be806888ce",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_6.png": {
+    "mtime": 1794953486.5834348,
+    "seen": 1795245757.5646267,
+    "ast_hash": "03c2059e635f8ae5f47aa15e887bf497",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_7.png": {
+    "mtime": 1794953486.870024,
+    "seen": 1795245757.5646267,
+    "ast_hash": "03a7df8164764536aa16b60601d6dd9f",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_8.png": {
+    "mtime": 1794953202.7329812,
+    "seen": 1795245757.5646267,
+    "ast_hash": "558fbc69e11d3bfb598e3bb410a6f179",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_9.png": {
+    "mtime": 1794952874.791612,
+    "seen": 1795245757.5646267,
+    "ast_hash": "512f17a8ffb1eab57392481634fc439c",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_bbq.svg": {
+    "mtime": 1794952479.9608772,
+    "seen": 1795245757.5646267,
+    "ast_hash": "5fd835003eb2edbb09081e2200577fd1",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_default.svg": {
+    "mtime": 1794952479.9603772,
+    "seen": 1795245757.5646267,
+    "ast_hash": "99b3fb38d7a341350fef831e501fb9c8",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_four_cheese.svg": {
+    "mtime": 1794952479.9613779,
+    "seen": 1795245757.5646267,
+    "ast_hash": "f3875a0f0ebad64928d3dd3b44b4aaeb",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_pepperoni.svg": {
+    "mtime": 1794952479.9598777,
+    "seen": 1795245757.5646267,
+    "ast_hash": "99b3fb38d7a341350fef831e501fb9c8",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/pizza_special.svg": {
+    "mtime": 1794952479.9603772,
+    "seen": 1795245757.5646267,
+    "ast_hash": "517c463b770f6992d5c2c30b26b4e22e",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/sauce.svg": {
+    "mtime": 1794952479.963377,
+    "seen": 1795245757.5646267,
+    "ast_hash": "b46a52baf1bc34ce3f04aee27b38e4b9",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/sauce_37.png": {
+    "mtime": 1794953879.8434696,
+    "seen": 1795245757.5646267,
+    "ast_hash": "93a4391386a670a62b05f339d1af61e9",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/sauce_38.png": {
+    "mtime": 1794953879.872602,
+    "seen": 1795245757.5646267,
+    "ast_hash": "efb5baf03a4411a4fd21e1ade2a7668a",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/sauce_39.png": {
+    "mtime": 1794953879.9017663,
+    "seen": 1795245757.5646267,
+    "ast_hash": "d894ba7187432f49d6168d1335c1bb32",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/sauce_40.png": {
+    "mtime": 1794953879.9304903,
+    "seen": 1795245757.5646267,
+    "ast_hash": "ccba7bd6bd9dc18321203d72d69ed7db",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_16.png": {
+    "mtime": 1794952877.9587379,
+    "seen": 1795245757.5646267,
+    "ast_hash": "5e85f1b0803c054e3fc79eb57aef6af1",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_17.png": {
+    "mtime": 1794953202.7820513,
+    "seen": 1795245757.5646267,
+    "ast_hash": "b9dcbde25307ffc124402081464a21c0",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_18.png": {
+    "mtime": 1794952878.6844363,
+    "seen": 1795245757.5646267,
+    "ast_hash": "d68e5094cb9bc2d20bf6491c4839f6ea",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_19.png": {
+    "mtime": 1794953202.8285947,
+    "seen": 1795245757.5646267,
+    "ast_hash": "19c42d3009cb3ed99c33903f81ab5b7d",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_20.png": {
+    "mtime": 1794953202.8741667,
+    "seen": 1795245757.5646267,
+    "ast_hash": "fce92977428fd118eece6a72a21effe9",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_21.png": {
+    "mtime": 1794953879.8149216,
+    "seen": 1795245757.5646267,
+    "ast_hash": "881473d3a4f34eea8ef025a5aecacfd0",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_22.png": {
+    "mtime": 1794952880.465343,
+    "seen": 1795245757.5646267,
+    "ast_hash": "5e85f1b0803c054e3fc79eb57aef6af1",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_nuggets.svg": {
+    "mtime": 1794952479.9618788,
+    "seen": 1795245757.5646267,
+    "ast_hash": "2bdda8a1e11825b7afb09f2764e64a80",
+    "semantic_hash": ""
+  },
+  "project/wwwroot/img/snack_roll.svg": {
+    "mtime": 1794952479.9618788,
+    "seen": 1795245757.5646267,
+    "ast_hash": "a859d442e8d56206941f35298bbaa750",
+    "semantic_hash": ""
+  }
+}
