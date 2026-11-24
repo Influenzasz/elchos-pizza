@@ -1,11 +1,13 @@
 # ==============================================================================
 # Dockerfile для облачного развертывания Elcho's Pizza (Render.com / Railway.app)
-# Базовый образ: Облегченная среда выполнения Mono на базе Debian
+# Базовый образ: Актуальный Debian 12 (Bookworm) с официальным Mono runtime и SQLite
 # ==============================================================================
-FROM mono:6.12-slim
+FROM debian:bookworm-slim
 
-# Установка нативной библиотеки SQLite3 и системных зависимостей
+# Установка актуального Mono и SQLite3 из официальных репозиториев Debian 12
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    mono-runtime \
+    mono-complete \
     sqlite3 \
     libsqlite3-0 \
     ca-certificates \
@@ -13,21 +15,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Копирование исходных файлов, скомпилированного сервера и веб-ресурсов
+# Копирование файлов проекта
 COPY . /app/
 
-# Настройка прав на запуск entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+# Настройка dllmap для связи Windows P/Invoke winsqlite3.dll -> Linux libsqlite3.so.0
+RUN echo '<configuration><dllmap dll="winsqlite3.dll" target="libsqlite3.so.0" /></configuration>' > /app/Server.exe.config && \
+    cp /app/Server.exe.config /app/project/Server.exe.config
 
-# Точка монтирования для постоянного диска (Persistent Volume)
+# Точка монтирования для диска (если подключен)
 VOLUME ["/data"]
 
-# Порт по умолчанию (облачные провайдеры переопределяют через ENV PORT)
-ENV PORT=5000
-ENV DATABASE_PATH=/data/pizza.db
+ENV PORT=10000
 ENV AUTO_OPEN_BROWSER=false
 
-EXPOSE 5000
+EXPOSE 10000
 
-# Запуск через стартовый скрипт инициализации тома
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Запуск с поддержкой постоянного диска и любых динамических портов Render / Railway
+CMD ["/bin/bash", "-c", "mkdir -p /data; if [ -d /data ] && [ ! -f /data/pizza.db ] && [ -f /app/project/pizza.db ]; then cp /app/project/pizza.db /data/pizza.db 2>/dev/null || true; chmod 666 /data/pizza.db 2>/dev/null || true; fi; export DATABASE_PATH=${DATABASE_PATH:-/data/pizza.db}; export PORT=${PORT:-10000}; echo '[Cloud] Starting Elcho Pizza Server on port '$PORT; exec mono /app/Server.exe"]

@@ -6,18 +6,12 @@ services:
   - type: web
     name: elchos-pizza
     runtime: docker
-    plan: starter
+    plan: free
     region: frankfurt # или oregon / singapore
     dockerfilePath: Dockerfile
     healthCheckPath: /api/categories
-    disk:
-      name: pizza-data
-      mountPath: /data
-      sizeGB: 1
     envVars:
       - key: PORT
         value: 10000
-      - key: DATABASE_PATH
-        value: /data/pizza.db
       - key: AUTO_OPEN_BROWSER
         value: false
