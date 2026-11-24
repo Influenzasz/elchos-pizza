@@ -1,0 +1,2 @@
+https://elchos-pizza.onrender.com
+# Укажите здесь ваш точный адрес с панели Render.com или Railway.app, если он отличается
